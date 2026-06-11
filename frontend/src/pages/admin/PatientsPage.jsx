@@ -1,0 +1,186 @@
+import { useState } from 'react';
+import { useFetch } from '../../hooks/useFetch';
+import { useApi } from '../../hooks/useApi';
+import { api } from '../../api/client';
+import LoadingSpinner from '../../components/shared/LoadingSpinner';
+import PatientForm from '../../components/admin/PatientForm';
+import { Search, UserPlus, Phone, Mail, AlertOctagon } from 'lucide-react';
+
+export default function PatientsPage() {
+  const { data: patients, loading, refetch } = useFetch(api.getPatients);
+  const { execute: savePatient, loading: saving } = useApi();
+  const { execute: deletePatient } = useApi();
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+
+  const filteredPatients = patients?.filter(p => 
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    p.phone?.includes(searchTerm)
+  );
+
+  const handleOpenModal = (patient = null) => {
+    setSelectedPatient(patient);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedPatient(null);
+    setIsModalOpen(false);
+  };
+
+  const handleSave = async (formData) => {
+    try {
+      if (selectedPatient) {
+        await savePatient(api.updatePatient, selectedPatient.id, formData);
+      } else {
+        await savePatient(api.createPatient, formData);
+      }
+      refetch(); // Recargar la lista
+      handleCloseModal();
+    } catch (err) {
+      alert("Error al guardar paciente: " + err.message);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("¿Estás seguro de que deseas eliminar a este paciente definitivamente? Esta acción no se puede deshacer.")) {
+      try {
+        await deletePatient(api.deletePatient, id);
+        refetch();
+        handleCloseModal();
+      } catch (err) {
+        alert("Error al eliminar paciente: " + err.message);
+      }
+    }
+  };
+
+  return (
+    <div className="animate-fade-in">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+        <div>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text)' }}>
+            Pacientes
+          </h2>
+          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)' }}>
+            Directorio y expedientes médicos.
+          </p>
+        </div>
+        <button onClick={() => handleOpenModal()} className="btn btn-primary" style={{ padding: '0.625rem' }}>
+          <UserPlus size={18} /> <span className="hidden sm:inline" style={{ marginLeft: '0.5rem' }}>Nuevo</span>
+        </button>
+      </div>
+
+      {/* Buscador */}
+      <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+        <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
+        <input 
+          type="text" 
+          placeholder="Buscar por nombre o teléfono..." 
+          className="input"
+          style={{ paddingLeft: '2.5rem' }}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      {/* Lista de Pacientes */}
+      <div style={{ display: 'grid', gap: '1rem' }}>
+        {loading ? (
+          <LoadingSpinner text="Cargando pacientes..." />
+        ) : filteredPatients && filteredPatients.length > 0 ? (
+          filteredPatients.map(patient => (
+            <div 
+              key={patient.id} 
+              onClick={() => handleOpenModal(patient)}
+              className="card animate-fade-in-up" 
+              style={{ 
+                padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem',
+                cursor: 'pointer',
+                border: patient.isBlacklisted ? '1px solid var(--color-danger)' : '1px solid var(--color-border)',
+                background: patient.isBlacklisted ? 'var(--color-danger-light)' : 'var(--color-surface)',
+                opacity: patient.isBlacklisted ? 0.9 : 1
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{
+                    width: '44px', height: '44px', borderRadius: '50%',
+                    background: patient.isBlacklisted ? 'var(--color-danger)' : 'var(--color-primary-light)', 
+                    color: patient.isBlacklisted ? 'white' : 'var(--color-primary-dark)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: 700, fontSize: '1.125rem'
+                  }}>
+                    {patient.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 700, color: patient.isBlacklisted ? '#991B1B' : 'var(--color-text)' }}>
+                      {patient.name}
+                    </h3>
+                    <p style={{ fontSize: '0.75rem', color: patient.isBlacklisted ? '#991B1B' : 'var(--color-text-muted)' }}>
+                      Registrado: {new Date(patient.createdAt).toLocaleDateString('es-MX')}
+                    </p>
+                  </div>
+                </div>
+                
+                {patient.isBlacklisted && (
+                  <span className="badge badge-danger" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <AlertOctagon size={14} /> Blacklist
+                  </span>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '0.25rem' }}>
+                {patient.phone && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem', color: patient.isBlacklisted ? '#991B1B' : 'var(--color-text-muted)' }}>
+                    <Phone size={14} /> {patient.phone}
+                  </div>
+                )}
+                {patient.email && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem', color: patient.isBlacklisted ? '#991B1B' : 'var(--color-text-muted)' }}>
+                    <Mail size={14} /> {patient.email}
+                  </div>
+                )}
+              </div>
+              
+              {/* Preview alergias y padecimientos */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
+                {patient.allergies && patient.allergies.toLowerCase() !== 'ninguna' && (
+                  <span className="badge badge-danger" style={{ fontSize: '0.65rem' }}>
+                    Alergia: {patient.allergies}
+                  </span>
+                )}
+                {/* Insights / Tratamientos (renderizados como tags) */}
+                {patient.insights && patient.insights.split(',').map((insight, idx) => {
+                  const val = insight.trim();
+                  if (!val) return null;
+                  return (
+                    <span key={idx} className="badge" style={{ fontSize: '0.65rem', background: 'var(--color-primary-light)', color: 'var(--color-primary-dark)' }}>
+                      {val}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="card" style={{ padding: '3rem 1rem', textAlign: 'center' }}>
+            <p style={{ color: 'var(--color-text-muted)' }}>No se encontraron pacientes.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Modal de Formulario */}
+      {isModalOpen && (
+        <PatientForm 
+          patient={selectedPatient} 
+          onSave={handleSave} 
+          onClose={handleCloseModal}
+          onDelete={selectedPatient ? handleDelete : null}
+          saving={saving}
+        />
+      )}
+    </div>
+  );
+}
