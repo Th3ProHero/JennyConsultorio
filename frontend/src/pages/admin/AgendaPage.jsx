@@ -78,7 +78,7 @@ export default function AgendaPage() {
   });
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in pb-28 min-h-screen overflow-x-hidden">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text)' }}>

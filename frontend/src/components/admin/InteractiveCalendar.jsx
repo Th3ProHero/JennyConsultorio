@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { Clock, AlertCircle } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Clock, AlertCircle, Info } from 'lucide-react';
 
 // Generates an array of time slots (e.g. 08:00 to 20:00 every 30 mins)
 const generateTimeSlots = (startHour = 8, endHour = 20) => {
@@ -13,7 +13,8 @@ const generateTimeSlots = (startHour = 8, endHour = 20) => {
 };
 
 export default function InteractiveCalendar({ appointments = [], onSlotClick, onAppointmentClick }) {
-  const timeSlots = useMemo(() => generateTimeSlots(8, 20), []);
+  const [showLegend, setShowLegend] = useState(false);
+  const timeSlots = useMemo(() => generateTimeSlots(8, 22), []);
   
   // Basic grid setup: Each slot is 60px height. 1 min = 2px.
   const PIXELS_PER_MINUTE = 2;
@@ -41,24 +42,37 @@ export default function InteractiveCalendar({ appointments = [], onSlotClick, on
 
   return (
     <div style={{ background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)', overflow: 'hidden' }}>
-      {/* Header */}
-      <div style={{ padding: '1rem', borderBottom: '1px solid var(--color-border)', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem' }}>
-          <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: 'var(--color-primary)' }}></div> Confirmada
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem' }}>
-          <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: 'var(--color-success)' }}></div> Completada
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem' }}>
-          <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: 'var(--color-warning)' }}></div> Por Confirmar
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem' }}>
-          <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: '#8B5CF6' }}></div> Por Reagendar
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem' }}>
-          <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: 'var(--color-surface-hover)', border: '1px dashed var(--color-text-muted)' }}></div> Cancelada
-        </div>
+      {/* Legend Toggle Header */}
+      <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'flex-end' }}>
+        <button 
+          onClick={() => setShowLegend(!showLegend)} 
+          className="btn btn-outline" 
+          style={{ padding: '0.375rem 0.75rem', fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '0.5rem', background: showLegend ? 'var(--color-surface-hover)' : 'transparent' }}
+        >
+          <Info size={16} /> {showLegend ? 'Ocultar Leyenda' : 'Ver Leyenda'}
+        </button>
       </div>
+
+      {/* Legend Content */}
+      {showLegend && (
+        <div className="animate-fade-in" style={{ padding: '1rem', borderBottom: '1px solid var(--color-border)', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', background: 'var(--color-bg)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem' }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: 'var(--color-primary)' }}></div> Confirmada
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem' }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: 'var(--color-success)' }}></div> Completada
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem' }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: 'var(--color-warning)' }}></div> Por Confirmar
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem' }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: '#8B5CF6' }}></div> Por Reagendar
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem' }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '2px', background: 'var(--color-surface-hover)', border: '1px dashed var(--color-text-muted)' }}></div> Cancelada
+          </div>
+        </div>
+      )}
 
       {/* Calendar Grid Container */}
       <div style={{ display: 'flex', height: '600px', overflowY: 'auto', position: 'relative' }}>
@@ -106,8 +120,8 @@ export default function InteractiveCalendar({ appointments = [], onSlotClick, on
           {appointments.map((appt) => {
             const timeStr = new Date(appt.scheduledDate).toTimeString().slice(0,5);
             const startMins = timeToMinutes(timeStr);
-            // Skip rendering if outside our 8am-8pm bounds entirely
-            if (startMins < dayStartMinutes || startMins > timeToMinutes('20:00')) return null;
+            // Skip rendering if outside our 8am-10pm bounds entirely
+            if (startMins < dayStartMinutes || startMins > timeToMinutes('22:00')) return null;
 
             const top = (startMins - dayStartMinutes) * PIXELS_PER_MINUTE;
             const height = appt.durationMinutes * PIXELS_PER_MINUTE;

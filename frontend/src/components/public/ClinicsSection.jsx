@@ -4,17 +4,17 @@ export default function ClinicsSection() {
   const clinics = [
     {
       id: 1,
-      name: 'Constitución 1917',
+      name: 'Consultorio Constitución',
       address: 'Margarita 59, Los Ángeles, Iztapalapa, 09830 Ciudad de México, CDMX',
       hours: 'Lunes a Viernes: Previa Cita',
       mapUrl: 'https://www.google.com/maps/place/Margarita+59,+Los+Ángeles,+Iztapalapa,+09830+Ciudad+de+México,+CDMX/@19.3462199,-99.0683456,15z/data=!4m6!3m5!1s0x85d1fd889b87e067:0x65b8117af0c51335!8m2!3d19.3462774!4d-99.0684851!16s%2Fg%2F11csnb5nv2?entry=ttu&g_ep=EgoyMDI2MDYwMy4xIKXMDSoASAFQAw%3D%3D',
     },
     {
       id: 2,
-      name: 'Citlali',
-      address: 'Consultorio Citlali, Iztapalapa, CDMX',
+      name: 'Consultorio Citlali',
+      address: 'Constitución & Fresno, Citlalli, Iztapalapa, 09660 Ciudad de México, CDMX',
       hours: 'Lunes a Viernes: Previa Cita',
-      mapUrl: 'https://www.google.com/maps/search/dentista/@19.3404348,-99.0231347,21z?entry=ttu&g_ep=EgoyMDI2MDYwMy4xIKXMDSoASAFQAw%3D%3D',
+      mapUrl: 'https://maps.app.goo.gl/NjZKpND7yn8Be8co8',
     }
   ];
 
