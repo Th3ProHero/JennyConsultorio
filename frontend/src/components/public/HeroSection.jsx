@@ -101,11 +101,11 @@ export default function HeroSection({ dentists = [] }) {
             Cuidamos tu salud dental con tecnología de vanguardia, un trato cálido y profesionalismo.
           </p>
 
-          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="#servicios" className="btn btn-primary" style={{ padding: '0.875rem 2rem', fontSize: '0.9375rem', background: 'var(--color-accent-pink)', boxShadow: '0 4px 14px rgba(255, 158, 187, 0.4)' }}>
+          <div className="btn-container-mobile" style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a href="#servicios" className="btn btn-primary btn-full-mobile" style={{ padding: '0.875rem 2rem', fontSize: '0.9375rem', background: 'var(--color-accent-pink)', boxShadow: '0 4px 14px rgba(255, 158, 187, 0.4)' }}>
               Ver Servicios
             </a>
-            <a href="#consultorios" className="btn btn-outline" style={{ padding: '0.875rem 2rem', fontSize: '0.9375rem', borderColor: 'var(--color-accent-pink)', color: 'var(--color-accent-pink-dark)' }}>
+            <a href="#consultorios" className="btn btn-outline btn-full-mobile" style={{ padding: '0.875rem 2rem', fontSize: '0.9375rem', borderColor: 'var(--color-accent-pink)', color: 'var(--color-accent-pink-dark)' }}>
               Ubicaciones
             </a>
           </div>

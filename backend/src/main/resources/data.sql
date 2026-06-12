@@ -40,6 +40,30 @@ INSERT INTO services (id, name, description, base_price, original_price, is_prom
 VALUES (8, 'Endodoncia Unirradicular', 'Tratamiento de conductos para salvar piezas dentales dañadas', 3500.00, NULL, false)
 ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO services (id, name, description, base_price, original_price, is_promotion)
+VALUES (9, 'Profilaxis Dental Completa', 'Aplicación de flúor y limpieza preventiva integral', 900.00, NULL, false)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO services (id, name, description, base_price, original_price, is_promotion)
+VALUES (10, 'Retiro de Amalgama', 'Reemplazo seguro de amalgama por resina estética del color del diente', 1100.00, NULL, false)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO services (id, name, description, base_price, original_price, is_promotion)
+VALUES (11, 'Pulpotomía Infantil', 'Tratamiento de nervio en dientes de leche para niños', 1500.00, NULL, false)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO services (id, name, description, base_price, original_price, is_promotion)
+VALUES (12, 'Selladores de Fosetas y Fisuras', 'Capa protectora para prevenir caries en premolares y molares', 450.00, NULL, false)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO services (id, name, description, base_price, original_price, is_promotion)
+VALUES (13, 'Corona de Porcelana', 'Restauración profunda que cubre completamente la pieza dental', 4500.00, NULL, false)
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO services (id, name, description, base_price, original_price, is_promotion)
+VALUES (14, 'Consulta de Emergencia', 'Atención prioritaria para alivio de dolor agudo o traumatismo dental', 600.00, NULL, false)
+ON CONFLICT (id) DO NOTHING;
+
 -- Reset sequences to avoid conflicts with future inserts
 SELECT setval('dentists_id_seq', (SELECT MAX(id) FROM dentists));
 SELECT setval('patients_id_seq', (SELECT MAX(id) FROM patients));

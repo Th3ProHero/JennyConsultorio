@@ -52,32 +52,32 @@ export default function PatientForm({ patient, onSave, onClose, onDelete, saving
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <form onSubmit={handleSubmit} style={{ padding: '1.25rem', paddingBottom: '6rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           
           <div>
             <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Nombre Completo *</label>
-            <input required type="text" name="name" value={formData.name} onChange={handleChange} className="input" placeholder="Ej. Ana Sofía Morales" />
+            <input required type="text" name="name" value={formData.name} onChange={handleChange} className="input w-full" placeholder="Ej. Ana Sofía Morales" />
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <div style={{ flex: 1 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-4">
+            <div>
               <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Teléfono</label>
-              <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="input" placeholder="+52 ..." />
+              <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="input w-full" placeholder="+52 ..." />
             </div>
-            <div style={{ flex: 1 }}>
+            <div>
               <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Correo Electrónico</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} className="input" placeholder="correo@ejemplo.com" />
+              <input type="email" name="email" value={formData.email} onChange={handleChange} className="input w-full" placeholder="correo@ejemplo.com" />
             </div>
           </div>
 
           <div>
             <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Alergias</label>
-            <input type="text" name="allergies" value={formData.allergies} onChange={handleChange} className="input" placeholder="Ej. Penicilina, Látex, o 'Ninguna'" />
+            <input type="text" name="allergies" value={formData.allergies} onChange={handleChange} className="input w-full" placeholder="Ej. Penicilina, Látex, o 'Ninguna'" />
           </div>
 
           <div>
             <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Insights / Tratamientos Activos (separados por coma)</label>
-            <input type="text" name="insights" value={formData.insights} onChange={handleChange} className="input" placeholder="Ej. Brackets, Endodoncia, Seguimiento..." />
+            <input type="text" name="insights" value={formData.insights} onChange={handleChange} className="input w-full" placeholder="Ej. Brackets, Endodoncia, Seguimiento..." />
           </div>
 
           {/* Blacklist Toggle */}

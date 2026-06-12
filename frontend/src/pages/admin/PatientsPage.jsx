@@ -57,7 +57,7 @@ export default function PatientsPage() {
   };
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in pb-24 min-h-screen overflow-x-hidden">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-text)' }}>
@@ -114,8 +114,8 @@ export default function PatientsPage() {
                   }}>
                     {patient.name.charAt(0).toUpperCase()}
                   </div>
-                  <div>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 700, color: patient.isBlacklisted ? '#991B1B' : 'var(--color-text)' }}>
+                  <div className="overflow-hidden">
+                    <h3 className="truncate" style={{ fontSize: '1rem', fontWeight: 700, color: patient.isBlacklisted ? '#991B1B' : 'var(--color-text)' }}>
                       {patient.name}
                     </h3>
                     <p style={{ fontSize: '0.75rem', color: patient.isBlacklisted ? '#991B1B' : 'var(--color-text-muted)' }}>
@@ -133,13 +133,13 @@ export default function PatientsPage() {
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '0.25rem' }}>
                 {patient.phone && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem', color: patient.isBlacklisted ? '#991B1B' : 'var(--color-text-muted)' }}>
-                    <Phone size={14} /> {patient.phone}
+                  <div className="truncate max-w-full" style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem', color: patient.isBlacklisted ? '#991B1B' : 'var(--color-text-muted)' }}>
+                    <Phone size={14} style={{ flexShrink: 0 }} /> <span className="truncate">{patient.phone}</span>
                   </div>
                 )}
                 {patient.email && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem', color: patient.isBlacklisted ? '#991B1B' : 'var(--color-text-muted)' }}>
-                    <Mail size={14} /> {patient.email}
+                  <div className="truncate max-w-full" style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem', color: patient.isBlacklisted ? '#991B1B' : 'var(--color-text-muted)' }}>
+                    <Mail size={14} style={{ flexShrink: 0 }} /> <span className="truncate">{patient.email}</span>
                   </div>
                 )}
               </div>

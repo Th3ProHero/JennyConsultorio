@@ -370,3 +370,31 @@ body {
     border-radius: var(--radius-xl);
   }
 }
+
+/* ─── Mobile Optimizations ────────────────────────────── */
+@media (max-width: 767px) {
+  /* Hide decorative floating animations to reduce clutter & save battery */
+  .animate-float, .animate-float-slow {
+    display: none !important;
+  }
+  
+  /* Reduce side padding for better reading space on mobile */
+  .section-container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  /* Full width buttons on mobile */
+  .btn-full-mobile {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  /* Container for stacking buttons vertically */
+  .btn-container-mobile {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100%;
+  }
+}

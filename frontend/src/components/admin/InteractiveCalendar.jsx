@@ -75,8 +75,7 @@ export default function InteractiveCalendar({ appointments = [], onSlotClick, on
       )}
 
       {/* Calendar Grid Container */}
-      <div style={{ display: 'flex', height: '600px', overflowY: 'auto', position: 'relative' }}>
-        
+      <div style={{ display: 'flex', height: 'calc(100vh - 300px)', minHeight: '400px', overflowY: 'auto', position: 'relative' }}>        
         {/* Time Labels Column */}
         <div style={{ width: '60px', borderRight: '1px solid var(--color-border)', background: 'var(--color-bg)' }}>
           {timeSlots.map((time, i) => (
