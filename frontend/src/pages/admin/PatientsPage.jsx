@@ -205,6 +205,7 @@ export default function PatientsPage() {
           onSave={handleSave} 
           onClose={handleCloseModal}
           onDelete={selectedPatient ? handleDelete : null}
+          onApptUpdate={refetchAppts}
           saving={saving}
         />
       )}

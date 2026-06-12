@@ -19,6 +19,8 @@ export default function AppointmentForm({ appointment, selectedDate, selectedTim
     cost: 0
   });
 
+  const { data: dayAppointments } = useFetch(() => api.getAppointmentsByDate(formData.date), [formData.date]);
+
   const isReadOnly = appointment?.status === 'COMPLETED' || appointment?.status === 'CANCELLED';
 
   useEffect(() => {
@@ -75,9 +77,34 @@ export default function AppointmentForm({ appointment, selectedDate, selectedTim
     }
 
     // Compose scheduledDate from date and time
-    const scheduledDate = new Date(`${formData.date}T${formData.time}:00`).toISOString();
-    
-    // Find names
+    const scheduledDate = new Date(`${formData.date}T${formData.time}:00`);
+    const newStart = scheduledDate.getTime();
+    const newEnd = newStart + (parseInt(formData.durationMinutes) * 60000);
+
+    // Check collisions
+    if (dayAppointments && formData.status !== 'CANCELLED') {
+      const collision = dayAppointments.find(appt => {
+        // Ignorar la cita actual que estamos editando
+        if (appointment && appt.id === appointment.id) return false;
+        // Solo colisiona si es el mismo consultorio
+        if (appt.clinic !== formData.clinic) return false;
+        // Las citas canceladas no ocupan espacio
+        if (appt.status === 'CANCELLED') return false;
+        
+        const apptStart = new Date(appt.scheduledDate).getTime();
+        const apptEnd = apptStart + (appt.durationMinutes * 60000);
+        
+        return newStart < apptEnd && newEnd > apptStart;
+      });
+
+      if (collision) {
+        const collisionTime = new Date(collision.scheduledDate).toTimeString().slice(0, 5);
+        alert(`🚨 Espacio ocupado en consultorio ${collision.clinic}.\n\nCita existente:\nPaciente: ${collision.patientName}\nHorario: ${collisionTime}\nProcedimiento: ${collision.serviceName}\n\nPor favor, elige otro horario o consultorio.`);
+        return;
+      }
+    }
+
+    const scheduledDateString = scheduledDate.toISOString();
     const selectedService = services?.find(s => s.id === parseInt(formData.serviceId));
 
     onSave({
@@ -90,7 +117,7 @@ export default function AppointmentForm({ appointment, selectedDate, selectedTim
       cost: parseFloat(formData.cost),
       dentistId: 1, // Defaulting to Jenny F.
       dentistName: 'Jenny F.',
-      scheduledDate
+      scheduledDate: scheduledDateString
     });
   };
 
