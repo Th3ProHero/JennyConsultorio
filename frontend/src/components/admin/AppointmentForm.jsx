@@ -154,14 +154,14 @@ export default function AppointmentForm({ appointment, selectedDate, selectedTim
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ padding: '1.25rem', paddingBottom: '6rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <form onSubmit={handleSubmit} style={{ padding: '1.25rem', paddingBottom: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>
                 <User size={14}/> Paciente *
               </label>
-              <select required name="patientId" value={formData.patientId} onChange={handleChange} className="input w-full" disabled={isReadOnly}>
+              <select required name="patientId" value={formData.patientId} onChange={handleChange} className="input" disabled={isReadOnly}>
                 <option value="">Selecciona un paciente...</option>
                 {patients?.map(p => (
                   <option key={p.id} value={p.id} disabled={p.isBlacklisted}>
@@ -174,19 +174,19 @@ export default function AppointmentForm({ appointment, selectedDate, selectedTim
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>
                 <MapPin size={14}/> Consultorio
               </label>
-              <select name="clinic" value={formData.clinic} onChange={handleChange} className="input w-full" disabled={isReadOnly}>
+              <select name="clinic" value={formData.clinic} onChange={handleChange} className="input" disabled={isReadOnly}>
                 <option value="Constitución 1917">Consultorio Constitución</option>
                 <option value="Citlali">Consultorio Citlali</option>
               </select>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>
                 <Stethoscope size={14}/> Procedimiento *
               </label>
-              <select required name="serviceId" value={formData.serviceId} onChange={handleChange} className="input w-full" disabled={isReadOnly}>
+              <select required name="serviceId" value={formData.serviceId} onChange={handleChange} className="input" disabled={isReadOnly}>
                 <option value="">Selecciona servicio...</option>
                 {services?.map(s => (
                   <option key={s.id} value={s.id}>{s.name} ({formatCurrency(s.basePrice)})</option>
@@ -197,26 +197,26 @@ export default function AppointmentForm({ appointment, selectedDate, selectedTim
               <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>
                 Costo Aplicado
               </label>
-              <input required type="number" name="cost" value={formData.cost} onChange={handleChange} className="input w-full" disabled={isReadOnly} />
+              <input required type="number" name="cost" value={formData.cost} onChange={handleChange} className="input" disabled={isReadOnly} />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 w-full gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>
                 <CalIcon size={14}/> Fecha *
               </label>
-              <input required type="date" name="date" value={formData.date} onChange={handleChange} className="input w-full" disabled={isReadOnly} />
+              <input required type="date" name="date" value={formData.date} onChange={handleChange} className="input" disabled={isReadOnly} />
             </div>
             <div>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>
                 <Clock size={14}/> Hora *
               </label>
-              <input required type="time" name="time" value={formData.time} step="1800" onChange={handleChange} className="input w-full" disabled={isReadOnly} />
+              <input required type="time" name="time" value={formData.time} step="1800" onChange={handleChange} className="input" disabled={isReadOnly} />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Duración (min) *</label>
-              <select required name="durationMinutes" value={formData.durationMinutes} onChange={handleChange} className="input w-full" disabled={isReadOnly}>
+              <select required name="durationMinutes" value={formData.durationMinutes} onChange={handleChange} className="input" disabled={isReadOnly}>
                 <option value="30">30 min</option>
                 <option value="60">1 hr</option>
                 <option value="90">1.5 hrs</option>
@@ -227,7 +227,7 @@ export default function AppointmentForm({ appointment, selectedDate, selectedTim
 
           <div>
             <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Estado</label>
-            <select name="status" value={formData.status} onChange={handleChange} className="input w-full" disabled={isReadOnly}>
+            <select name="status" value={formData.status} onChange={handleChange} className="input" disabled={isReadOnly}>
               <option value="PENDING">Agendada / Por Confirmar</option>
               <option value="CONFIRMED">Confirmada</option>
               <option value="TO_RESCHEDULE">Por Reagendar</option>
@@ -248,11 +248,15 @@ export default function AppointmentForm({ appointment, selectedDate, selectedTim
 
           <div>
             <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Notas</label>
-            <textarea name="notes" value={formData.notes} onChange={handleChange} className="input w-full" rows="2" placeholder="Información adicional de la cita..." disabled={isReadOnly}></textarea>
+            <textarea name="notes" value={formData.notes} onChange={handleChange} className="input" rows="2" placeholder="Información adicional de la cita..." disabled={isReadOnly}></textarea>
           </div>
 
           {/* Actions */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
+          <div style={{ 
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
+            marginTop: '0.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--color-border)',
+            paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom) + 5rem)'
+          }}>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               {appointment && onDelete && !isReadOnly ? (
                 <button type="button" onClick={() => onDelete(appointment.id)} className="btn btn-danger" style={{ padding: '0.625rem' }} title="Eliminar cita">

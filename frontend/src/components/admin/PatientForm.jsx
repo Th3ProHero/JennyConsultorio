@@ -6,8 +6,11 @@ import { useApi } from '../../hooks/useApi';
 import { api } from '../../api/client';
 
 export default function PatientForm({ patient, allAppointments, onSave, onClose, onDelete, onApptUpdate, saving }) {
+  // Default to 'historial' if patient exists, else 'datos'
+  const [activeTab, setActiveTab] = useState(patient ? 'historial' : 'datos');
   const [isEditing, setIsEditing] = useState(!patient);
   const [editingAppt, setEditingAppt] = useState(null);
+  
   const { execute: saveAppointment, loading: savingAppt } = useApi();
   const { execute: deleteAppointment } = useApi();
   
@@ -30,9 +33,11 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
         allergies: patient.allergies || '',
         isBlacklisted: patient.isBlacklisted || false
       });
-      setIsEditing(false); // Reset to view mode when patient changes
+      setIsEditing(false);
+      setActiveTab('historial');
     } else {
       setIsEditing(true);
+      setActiveTab('datos');
     }
   }, [patient]);
 
@@ -102,11 +107,11 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
   return (
     <>
       <div className="modal-overlay" onClick={onClose} style={{ zIndex: 100 }}>
-        <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '1000px', display: 'flex', flexDirection: 'column', height: '90vh' }}>
+        <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '650px', display: 'flex', flexDirection: 'column', height: '90vh' }}>
           
           {/* Header */}
           <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--color-border)', flexShrink: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
               <div>
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>
                   {patient ? (isEditing ? 'Editar Paciente' : 'Expediente del Paciente') : 'Nuevo Paciente'}
@@ -121,200 +126,211 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
                 <X size={20} />
               </button>
             </div>
+
+            {/* Tabs */}
+            {patient && (
+              <div style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid var(--color-border)', overflowX: 'auto', paddingBottom: '2px' }}>
+                <button 
+                  className={`tab ${activeTab === 'historial' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('historial')}
+                >
+                  Historial de Citas
+                </button>
+                <button 
+                  className={`tab ${activeTab === 'datos' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('datos')}
+                >
+                  Datos Personales
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Content Area - 2 Columns */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem' }}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-full">
-              
-              {/* COLUMNA IZQUIERDA: HISTORIAL DE CITAS (Solo si el paciente existe) */}
-              {patient && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', paddingRight: '1rem', borderRight: '1px solid var(--color-border)' }} className="order-2 md:order-1 md:border-r">
-                  <div>
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--color-text)' }}>
-                      Citas del Paciente
-                    </h3>
-                    
-                    {patientAppts.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--color-text-muted)', background: 'var(--color-surface)', borderRadius: 'var(--radius-md)' }}>
-                        <Calendar size={40} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-                        <p>No hay citas registradas.</p>
-                      </div>
-                    ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                        
-                        {/* Próximas Citas */}
-                        {futureAppts.length > 0 && (
-                          <div>
-                            <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--color-text)', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
-                              Próximas Citas
-                            </h4>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                              {futureAppts.map(appt => (
-                                <div 
-                                  key={appt.id} 
-                                  className="card cursor-pointer active:scale-95 transition-transform" 
-                                  onClick={() => setEditingAppt(appt)}
-                                  style={{ padding: '1rem', borderLeft: `4px solid ${statusColors[appt.status]}`, position: 'relative' }}
-                                >
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                    <h5 style={{ fontWeight: 700, color: 'var(--color-text)', paddingRight: '2rem' }}>{appt.serviceName}</h5>
-                                    <span className="badge" style={{ background: 'var(--color-bg)', color: statusColors[appt.status], border: `1px solid ${statusColors[appt.status]}` }}>
-                                      {statusLabels[appt.status]}
-                                    </span>
-                                  </div>
-                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '0.75rem', fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                                      <Calendar size={14} /> {getRelativeTime(appt.scheduledDate)}
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                                      <Clock size={14} /> {new Date(appt.scheduledDate).toTimeString().slice(0,5)}
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                                      <MapPin size={14} /> {appt.clinic}
-                                    </div>
-                                  </div>
-                                  <div style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.3 }}>
-                                    <Edit2 size={16} />
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+          {/* Content Area */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '1.25rem', paddingBottom: '6rem' /* Extra space for mobile nav / buttons */ }}>
+            
+            {/* TAB: DATOS PERSONALES */}
+            <div style={{ display: activeTab === 'datos' ? 'block' : 'none' }}>
+              <form id="patientForm" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Nombre Completo *</label>
+                  <input required type="text" name="name" value={formData.name} onChange={handleChange} className="input" placeholder="Ej. Ana Sofía Morales" disabled={!isEditing} />
+                </div>
 
-                        {/* Citas Previas */}
-                        {pastAppts.length > 0 && (
-                          <div>
-                            <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--color-text)', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1rem', marginTop: futureAppts.length > 0 ? '1rem' : '0' }}>
-                              Historial
-                            </h4>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                              {pastAppts.map(appt => (
-                                <div 
-                                  key={appt.id} 
-                                  className="card cursor-pointer active:scale-95 transition-transform"
-                                  onClick={() => setEditingAppt(appt)} 
-                                  style={{ padding: '1rem', background: 'var(--color-bg)', opacity: appt.status === 'CANCELLED' ? 0.7 : 1, position: 'relative' }}
-                                >
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                    <h5 style={{ fontWeight: 600, color: 'var(--color-text)', paddingRight: '2rem' }}>{appt.serviceName}</h5>
-                                    <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: statusColors[appt.status] }}>
-                                      {statusLabels[appt.status].toUpperCase()}
-                                    </span>
-                                  </div>
-                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '0.5rem', fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                                      <Calendar size={14} /> {getRelativeTime(appt.scheduledDate)} ({new Date(appt.scheduledDate).toLocaleDateString('es-MX')})
-                                    </div>
-                                  </div>
-                                  <div style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.3 }}>
-                                    <Edit2 size={16} />
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Teléfono</label>
+                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="input" placeholder="+52 ..." disabled={!isEditing} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Correo Electrónico</label>
+                    <input type="email" name="email" value={formData.email} onChange={handleChange} className="input" placeholder="correo@ejemplo.com" disabled={!isEditing} />
                   </div>
                 </div>
-              )}
 
-              {/* COLUMNA DERECHA: DATOS PERSONALES */}
-              <div className={`order-1 md:order-2 ${!patient ? 'col-span-1 md:col-span-2 max-w-2xl mx-auto w-full' : ''}`}>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--color-text)' }}>
-                  Datos Personales
-                </h3>
-                <form id="patientForm" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Nombre Completo *</label>
-                    <input required type="text" name="name" value={formData.name} onChange={handleChange} className="input w-full" placeholder="Ej. Ana Sofía Morales" disabled={!isEditing} />
-                  </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Alergias</label>
+                  <input type="text" name="allergies" value={formData.allergies} onChange={handleChange} className="input" placeholder="Ej. Penicilina, Látex, o 'Ninguna'" disabled={!isEditing} />
+                </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-4">
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Teléfono</label>
-                      <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="input w-full" placeholder="+52 ..." disabled={!isEditing} />
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Insights / Tratamientos Activos (separados por coma)</label>
+                  <input type="text" name="insights" value={formData.insights} onChange={handleChange} className="input" placeholder="Ej. Brackets, Endodoncia, Seguimiento..." disabled={!isEditing} />
+                </div>
+
+                {/* Blacklist Toggle */}
+                <div style={{ 
+                  marginTop: '0.5rem', padding: '1rem', borderRadius: 'var(--radius-md)',
+                  background: formData.isBlacklisted ? 'var(--color-danger-light)' : 'var(--color-bg)',
+                  border: `1px solid ${formData.isBlacklisted ? 'var(--color-danger)' : 'var(--color-border)'}`,
+                  display: 'flex', alignItems: 'center', gap: '0.75rem', transition: 'all 0.3s ease',
+                  opacity: !isEditing ? 0.7 : 1
+                }}>
+                  <input 
+                    type="checkbox" 
+                    id="isBlacklisted" 
+                    name="isBlacklisted" 
+                    checked={formData.isBlacklisted} 
+                    onChange={handleChange}
+                    disabled={!isEditing}
+                    style={{ width: '1.25rem', height: '1.25rem', accentColor: 'var(--color-danger)' }}
+                  />
+                  <label htmlFor="isBlacklisted" style={{ flex: 1, cursor: isEditing ? 'pointer' : 'default' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ fontSize: '0.9375rem', fontWeight: 700, color: formData.isBlacklisted ? '#991B1B' : 'var(--color-text)' }}>
+                        Añadir a Lista Negra
+                      </span>
+                      {formData.isBlacklisted && <AlertTriangle size={16} color="#991B1B" />}
                     </div>
+                    <p style={{ fontSize: '0.75rem', color: formData.isBlacklisted ? '#991B1B' : 'var(--color-text-muted)' }}>
+                      Marcar si es un paciente conflictivo o que no debe ser agendado.
+                    </p>
+                  </label>
+                </div>
+              </form>
+            </div>
+
+            {/* TAB: HISTORIAL DE CITAS */}
+            <div style={{ display: activeTab === 'historial' ? 'block' : 'none' }}>
+              {patientAppts.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--color-text-muted)' }}>
+                  <Calendar size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
+                  <p>Este paciente no tiene historial de citas.</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                  
+                  {/* Próximas Citas */}
+                  {futureAppts.length > 0 && (
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Correo Electrónico</label>
-                      <input type="email" name="email" value={formData.email} onChange={handleChange} className="input w-full" placeholder="correo@ejemplo.com" disabled={!isEditing} />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Alergias</label>
-                    <input type="text" name="allergies" value={formData.allergies} onChange={handleChange} className="input w-full" placeholder="Ej. Penicilina, Látex, o 'Ninguna'" disabled={!isEditing} />
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>Insights / Tratamientos Activos (separados por coma)</label>
-                    <input type="text" name="insights" value={formData.insights} onChange={handleChange} className="input w-full" placeholder="Ej. Brackets, Endodoncia, Seguimiento..." disabled={!isEditing} />
-                  </div>
-
-                  {/* Blacklist Toggle */}
-                  <div style={{ 
-                    marginTop: '0.5rem', padding: '1rem', borderRadius: 'var(--radius-md)',
-                    background: formData.isBlacklisted ? 'var(--color-danger-light)' : 'var(--color-bg)',
-                    border: `1px solid ${formData.isBlacklisted ? 'var(--color-danger)' : 'var(--color-border)'}`,
-                    display: 'flex', alignItems: 'center', gap: '0.75rem', transition: 'all 0.3s ease',
-                    opacity: !isEditing ? 0.7 : 1
-                  }}>
-                    <input 
-                      type="checkbox" 
-                      id="isBlacklisted" 
-                      name="isBlacklisted" 
-                      checked={formData.isBlacklisted} 
-                      onChange={handleChange}
-                      disabled={!isEditing}
-                      style={{ width: '1.25rem', height: '1.25rem', accentColor: 'var(--color-danger)' }}
-                    />
-                    <label htmlFor="isBlacklisted" style={{ flex: 1, cursor: isEditing ? 'pointer' : 'default' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span style={{ fontSize: '0.9375rem', fontWeight: 700, color: formData.isBlacklisted ? '#991B1B' : 'var(--color-text)' }}>
-                          Añadir a Lista Negra
-                        </span>
-                        {formData.isBlacklisted && <AlertTriangle size={16} color="#991B1B" />}
+                      <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--color-text)', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
+                        Próximas Citas
+                      </h4>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {futureAppts.map(appt => (
+                          <div 
+                            key={appt.id} 
+                            className="card cursor-pointer active:scale-95 transition-transform" 
+                            onClick={() => setEditingAppt(appt)}
+                            style={{ padding: '1rem', borderLeft: `4px solid ${statusColors[appt.status]}`, position: 'relative' }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                              <h5 style={{ fontWeight: 700, color: 'var(--color-text)', paddingRight: '2rem' }}>{appt.serviceName}</h5>
+                              <span className="badge" style={{ background: 'var(--color-bg)', color: statusColors[appt.status], border: `1px solid ${statusColors[appt.status]}` }}>
+                                {statusLabels[appt.status]}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '0.75rem', fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                                <Calendar size={14} /> {getRelativeTime(appt.scheduledDate)}
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                                <Clock size={14} /> {new Date(appt.scheduledDate).toTimeString().slice(0,5)}
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                                <MapPin size={14} /> {appt.clinic}
+                              </div>
+                            </div>
+                            <div style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.3 }}>
+                              <Edit2 size={16} />
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <p style={{ fontSize: '0.75rem', color: formData.isBlacklisted ? '#991B1B' : 'var(--color-text-muted)' }}>
-                        Marcar si es un paciente conflictivo o que no debe ser agendado.
-                      </p>
-                    </label>
-                  </div>
-                </form>
-              </div>
+                    </div>
+                  )}
 
+                  {/* Citas Previas */}
+                  {pastAppts.length > 0 && (
+                    <div>
+                      <h4 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--color-text)', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
+                        Historial
+                      </h4>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {pastAppts.map(appt => (
+                          <div 
+                            key={appt.id} 
+                            className="card cursor-pointer active:scale-95 transition-transform"
+                            onClick={() => setEditingAppt(appt)} 
+                            style={{ padding: '1rem', background: 'var(--color-bg)', opacity: appt.status === 'CANCELLED' ? 0.7 : 1, position: 'relative' }}
+                          >
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                              <h5 style={{ fontWeight: 600, color: 'var(--color-text)', paddingRight: '2rem' }}>{appt.serviceName}</h5>
+                              <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: statusColors[appt.status] }}>
+                                {statusLabels[appt.status].toUpperCase()}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '0.5rem', fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                                <Calendar size={14} /> {getRelativeTime(appt.scheduledDate)} ({new Date(appt.scheduledDate).toLocaleDateString('es-MX')})
+                              </div>
+                            </div>
+                            <div style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.3 }}>
+                              <Edit2 size={16} />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
           {/* Footer Actions */}
-          <div style={{ padding: '1.25rem', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0, background: 'var(--color-surface)' }}>
-            {patient && onDelete ? (
-              <button type="button" onClick={() => onDelete(patient.id)} className="btn btn-danger" style={{ padding: '0.625rem' }} title="Eliminar paciente">
-                <Trash2 size={18} />
-              </button>
-            ) : <div />}
-            
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
-              {!isEditing && patient && (
-                <button type="button" onClick={() => setIsEditing(true)} className="btn btn-primary">
-                  <Edit2 size={18} /> <span className="hidden sm:inline" style={{ marginLeft: '0.5rem' }}>Editar Info</span>
+          {activeTab === 'datos' && (
+            <div style={{ 
+              padding: '1.25rem', borderTop: '1px solid var(--color-border)', 
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center', 
+              flexShrink: 0, background: 'var(--color-surface)',
+              paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom) + 5rem)' // Safe area and nav bar height buffer
+            }}>
+              {patient && onDelete ? (
+                <button type="button" onClick={() => onDelete(patient.id)} className="btn btn-danger" style={{ padding: '0.625rem' }} title="Eliminar paciente">
+                  <Trash2 size={18} />
                 </button>
-              )}
-              {isEditing && (
-                <>
-                  <button type="button" onClick={() => patient ? setIsEditing(false) : onClose()} className="btn btn-outline" disabled={saving}>
-                    Cancelar
+              ) : <div />}
+              
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                {!isEditing && patient && (
+                  <button type="button" onClick={() => setIsEditing(true)} className="btn btn-primary">
+                    <Edit2 size={18} /> <span className="hidden sm:inline" style={{ marginLeft: '0.5rem' }}>Editar Info</span>
                   </button>
-                  <button type="submit" form="patientForm" className="btn btn-primary" disabled={saving}>
-                    {saving ? 'Guardando...' : 'Guardar Paciente'}
-                  </button>
-                </>
-              )}
+                )}
+                {isEditing && (
+                  <>
+                    <button type="button" onClick={() => patient ? setIsEditing(false) : onClose()} className="btn btn-outline" disabled={saving}>
+                      Cancelar
+                    </button>
+                    <button type="submit" form="patientForm" className="btn btn-primary" disabled={saving}>
+                      {saving ? 'Guardando...' : 'Guardar Paciente'}
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
