@@ -373,11 +373,6 @@ body {
 
 /* ─── Mobile Optimizations ────────────────────────────── */
 @media (max-width: 767px) {
-  /* Hide decorative floating animations to reduce clutter & save battery */
-  .animate-float, .animate-float-slow {
-    display: none !important;
-  }
-  
   /* Reduce side padding for better reading space on mobile */
   .section-container {
     padding-left: 1rem !important;
