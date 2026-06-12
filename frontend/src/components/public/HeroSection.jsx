@@ -14,9 +14,19 @@ export default function HeroSection({ dentists = [] }) {
         <Heart size={40} fill="var(--color-accent-pink-light)" />
       </div>
       <div className="animate-float" style={{
+        position: 'absolute', top: '15%', right: '25%', fontSize: '2.5rem', opacity: 0.4, userSelect: 'none'
+      }}>
+        🦷
+      </div>
+      <div className="animate-float" style={{
         position: 'absolute', top: '20%', right: '10%', color: 'var(--color-primary-light)', opacity: 0.8
       }}>
         <Sparkles size={48} />
+      </div>
+      <div className="animate-float-slow" style={{
+        position: 'absolute', bottom: '10%', right: '25%', fontSize: '2rem', opacity: 0.3, animationDelay: '1.5s', userSelect: 'none'
+      }}>
+        🪥
       </div>
       <div className="animate-float-slow" style={{
         position: 'absolute', bottom: '15%', left: '15%', color: 'var(--color-accent-pink)', opacity: 0.5, animationDelay: '1s'
@@ -24,9 +34,19 @@ export default function HeroSection({ dentists = [] }) {
         <Star size={32} fill="var(--color-accent-pink-light)" />
       </div>
       <div className="animate-float" style={{
+        position: 'absolute', top: '40%', left: '10%', fontSize: '2rem', opacity: 0.3, animationDelay: '2.5s', userSelect: 'none'
+      }}>
+        ✨
+      </div>
+      <div className="animate-float" style={{
         position: 'absolute', bottom: '25%', right: '5%', color: 'var(--color-primary-light)', opacity: 0.6, animationDelay: '2s'
       }}>
         <Heart size={36} fill="var(--color-primary-100)" />
+      </div>
+      <div className="animate-float-slow" style={{
+        position: 'absolute', bottom: '30%', left: '20%', fontSize: '2.5rem', opacity: 0.4, animationDelay: '0.5s', userSelect: 'none'
+      }}>
+        😁
       </div>
 
       <div style={{
