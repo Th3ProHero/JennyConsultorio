@@ -139,6 +139,9 @@ export const api = {
   },
 
   // ── Appointments ──
+  getAllAppointments: async () => {
+    return new Promise(resolve => setTimeout(() => resolve([...mockAppointments]), 400));
+  },
   getAppointmentsByDate: async (date) => {
     return new Promise(resolve => setTimeout(() => {
       // Filter by date string (YYYY-MM-DD)

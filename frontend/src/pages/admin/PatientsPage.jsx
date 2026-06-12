@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useFetch } from '../../hooks/useFetch';
 import { useApi } from '../../hooks/useApi';
 import { api } from '../../api/client';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import PatientForm from '../../components/admin/PatientForm';
-import { Search, UserPlus, Phone, Mail, AlertOctagon } from 'lucide-react';
+import { Search, UserPlus, Phone, Mail, AlertOctagon, CalendarCheck } from 'lucide-react';
+import { getRelativeTime } from '../../utils/dateFormatter';
 
 export default function PatientsPage() {
-  const { data: patients, loading, refetch } = useFetch(api.getPatients);
+  const { data: patients, loading: loadingPatients, refetch: refetchPatients } = useFetch(api.getPatients);
+  const { data: allAppointments, loading: loadingAppts, refetch: refetchAppts } = useFetch(api.getAllAppointments);
+  
   const { execute: savePatient, loading: saving } = useApi();
   const { execute: deletePatient } = useApi();
   
@@ -37,7 +40,7 @@ export default function PatientsPage() {
       } else {
         await savePatient(api.createPatient, formData);
       }
-      refetch(); // Recargar la lista
+      refetchPatients(); // Recargar la lista
       handleCloseModal();
     } catch (err) {
       alert("Error al guardar paciente: " + err.message);
@@ -48,12 +51,23 @@ export default function PatientsPage() {
     if (window.confirm("¿Estás seguro de que deseas eliminar a este paciente definitivamente? Esta acción no se puede deshacer.")) {
       try {
         await deletePatient(api.deletePatient, id);
-        refetch();
+        refetchPatients();
         handleCloseModal();
       } catch (err) {
         alert("Error al eliminar paciente: " + err.message);
       }
     }
+  };
+
+  // Pre-calcular la última cita completada para cada paciente
+  const getLastAppointment = (patientId) => {
+    if (!allAppointments) return null;
+    const patientAppts = allAppointments.filter(a => a.patientId === patientId && a.status === 'COMPLETED');
+    if (patientAppts.length === 0) return null;
+    
+    // Ordenar de más reciente a más antigua
+    patientAppts.sort((a, b) => new Date(b.scheduledDate) - new Date(a.scheduledDate));
+    return patientAppts[0];
   };
 
   return (
@@ -87,10 +101,12 @@ export default function PatientsPage() {
 
       {/* Lista de Pacientes */}
       <div style={{ display: 'grid', gap: '1rem' }}>
-        {loading ? (
+        {loadingPatients || loadingAppts ? (
           <LoadingSpinner text="Cargando pacientes..." />
         ) : filteredPatients && filteredPatients.length > 0 ? (
-          filteredPatients.map(patient => (
+          filteredPatients.map(patient => {
+            const lastAppt = getLastAppointment(patient.id);
+            return (
             <div 
               key={patient.id} 
               onClick={() => handleOpenModal(patient)}
@@ -144,26 +160,36 @@ export default function PatientsPage() {
                 )}
               </div>
               
-              {/* Preview alergias y padecimientos */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-                {patient.allergies && patient.allergies.toLowerCase() !== 'ninguna' && (
-                  <span className="badge badge-danger" style={{ fontSize: '0.65rem' }}>
-                    Alergia: {patient.allergies}
-                  </span>
-                )}
-                {/* Insights / Tratamientos (renderizados como tags) */}
-                {patient.insights && patient.insights.split(',').map((insight, idx) => {
-                  const val = insight.trim();
-                  if (!val) return null;
-                  return (
-                    <span key={idx} className="badge" style={{ fontSize: '0.65rem', background: 'var(--color-primary-light)', color: 'var(--color-primary-dark)' }}>
-                      {val}
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                {/* Preview alergias y padecimientos */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  {patient.allergies && patient.allergies.toLowerCase() !== 'ninguna' && (
+                    <span className="badge badge-danger" style={{ fontSize: '0.65rem' }}>
+                      Alergia: {patient.allergies}
                     </span>
-                  );
-                })}
+                  )}
+                  {patient.insights && patient.insights.split(',').map((insight, idx) => {
+                    const val = insight.trim();
+                    if (!val) return null;
+                    return (
+                      <span key={idx} className="badge" style={{ fontSize: '0.65rem', background: 'var(--color-primary-light)', color: 'var(--color-primary-dark)' }}>
+                        {val}
+                      </span>
+                    );
+                  })}
+                </div>
+                
+                {/* Last Appointment Indicator */}
+                {lastAppt && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.75rem', color: 'var(--color-text-muted)', background: 'var(--color-bg)', padding: '0.25rem 0.5rem', borderRadius: '4px' }}>
+                    <CalendarCheck size={12} color="var(--color-success)" />
+                    Última cita: <strong>{getRelativeTime(lastAppt.scheduledDate)}</strong>
+                  </div>
+                )}
               </div>
             </div>
-          ))
+            );
+          })
         ) : (
           <div className="card" style={{ padding: '3rem 1rem', textAlign: 'center' }}>
             <p style={{ color: 'var(--color-text-muted)' }}>No se encontraron pacientes.</p>
@@ -175,6 +201,7 @@ export default function PatientsPage() {
       {isModalOpen && (
         <PatientForm 
           patient={selectedPatient} 
+          allAppointments={allAppointments}
           onSave={handleSave} 
           onClose={handleCloseModal}
           onDelete={selectedPatient ? handleDelete : null}

@@ -67,11 +67,17 @@ export default function AppointmentForm({ appointment, selectedDate, selectedTim
       return;
     }
 
+    const selectedPatient = patients?.find(p => p.id === parseInt(formData.patientId));
+    
+    if (selectedPatient?.isBlacklisted) {
+      alert("No se puede agendar a un paciente que está en la lista negra.");
+      return;
+    }
+
     // Compose scheduledDate from date and time
     const scheduledDate = new Date(`${formData.date}T${formData.time}:00`).toISOString();
     
     // Find names
-    const selectedPatient = patients?.find(p => p.id === parseInt(formData.patientId));
     const selectedService = services?.find(s => s.id === parseInt(formData.serviceId));
 
     onSave({
@@ -131,7 +137,9 @@ export default function AppointmentForm({ appointment, selectedDate, selectedTim
               <select required name="patientId" value={formData.patientId} onChange={handleChange} className="input w-full" disabled={isReadOnly}>
                 <option value="">Selecciona un paciente...</option>
                 {patients?.map(p => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
+                  <option key={p.id} value={p.id} disabled={p.isBlacklisted}>
+                    {p.name} {p.isBlacklisted ? '(Lista Negra)' : ''}
+                  </option>
                 ))}
               </select>
             </div>
