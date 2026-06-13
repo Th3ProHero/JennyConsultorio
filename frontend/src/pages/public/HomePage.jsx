@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useFetch } from '../../hooks/useFetch';
 import { api } from '../../api/client';
 import HeroSection from '../../components/public/HeroSection';
@@ -44,9 +45,14 @@ export default function HomePage() {
             Jenny Dentista
           </span>
         </div>
-        <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-          © {new Date().getFullYear()} Jenny Dentista. Todos los derechos reservados.
-        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
+          <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+            © {new Date().getFullYear()} Jenny Dentista. Todos los derechos reservados.
+          </p>
+          <Link to="/aviso-de-privacidad" style={{ fontSize: '0.8125rem', color: 'var(--color-primary)', textDecoration: 'underline' }}>
+            Aviso de Privacidad
+          </Link>
+        </div>
       </footer>
     </main>
   );

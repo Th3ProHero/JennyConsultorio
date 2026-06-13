@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { X, Trash2, AlertTriangle, Calendar, Clock, MapPin, Edit2 } from 'lucide-react';
+import { X, Trash2, AlertTriangle, Calendar, Clock, MapPin, Edit2, FileText, Upload, Image as ImageIcon } from 'lucide-react';
 import { getRelativeTime } from '../../utils/dateFormatter';
 import AppointmentForm from './AppointmentForm';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 import { useApi } from '../../hooks/useApi';
 import { api } from '../../api/client';
 
@@ -10,6 +11,7 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
   const [activeTab, setActiveTab] = useState(patient ? 'historial' : 'datos');
   const [isEditing, setIsEditing] = useState(!patient);
   const [editingAppt, setEditingAppt] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   
   const { execute: saveAppointment, loading: savingAppt } = useApi();
   const { execute: deleteAppointment } = useApi();
@@ -20,7 +22,8 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
     email: '',
     insights: '',
     allergies: '',
-    isBlacklisted: false
+    isBlacklisted: false,
+    documents: []
   });
 
   useEffect(() => {
@@ -31,7 +34,8 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
         email: patient.email || '',
         insights: patient.insights || '',
         allergies: patient.allergies || '',
-        isBlacklisted: patient.isBlacklisted || false
+        isBlacklisted: patient.isBlacklisted || false,
+        documents: patient.documents || []
       });
       setIsEditing(false);
       setActiveTab('historial');
@@ -54,6 +58,45 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
     e.preventDefault();
     if (!isEditing) return;
     onSave(formData);
+  };
+
+  const handleFileUpload = (e) => {
+    if (!isEditing) return;
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("El archivo es demasiado grande (máximo 5MB).");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData(prev => ({
+        ...prev,
+        documents: [
+          ...prev.documents,
+          { 
+            id: Date.now(), 
+            name: file.name, 
+            type: file.type, 
+            data: reader.result, 
+            date: new Date().toISOString() 
+          }
+        ]
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDeleteDocument = (id) => {
+    if (!isEditing) return;
+    if (window.confirm("¿Seguro que deseas eliminar este documento?")) {
+      setFormData(prev => ({
+        ...prev,
+        documents: prev.documents.filter(doc => doc.id !== id)
+      }));
+    }
   };
 
   const handleApptSave = async (apptData) => {
@@ -141,6 +184,12 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
                   onClick={() => setActiveTab('datos')}
                 >
                   Datos Personales
+                </button>
+                <button 
+                  className={`tab ${activeTab === 'documentos' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('documentos')}
+                >
+                  Documentos / Rx
                 </button>
               </div>
             )}
@@ -296,6 +345,61 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
                 </div>
               )}
             </div>
+
+            {/* TAB: DOCUMENTOS */}
+            <div style={{ display: activeTab === 'documentos' ? 'block' : 'none' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text)' }}>Radiografías y Documentos</h4>
+                {isEditing && (
+                  <div>
+                    <input 
+                      type="file" 
+                      id="fileUpload" 
+                      style={{ display: 'none' }} 
+                      accept="image/*,application/pdf"
+                      onChange={handleFileUpload} 
+                    />
+                    <label htmlFor="fileUpload" className="btn btn-primary" style={{ cursor: 'pointer', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Upload size={16} /> Subir Archivo
+                    </label>
+                  </div>
+                )}
+              </div>
+
+              {formData.documents.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--color-text-muted)' }}>
+                  <ImageIcon size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
+                  <p>Este paciente no tiene documentos o radiografías.</p>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+                  {formData.documents.map(doc => (
+                    <div key={doc.id} className="card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                      {doc.type.startsWith('image/') ? (
+                        <div style={{ height: '140px', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                          <img src={doc.data} alt={doc.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        </div>
+                      ) : (
+                        <div style={{ height: '140px', background: 'var(--color-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}>
+                          <FileText size={48} />
+                        </div>
+                      )}
+                      <div style={{ padding: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--color-border)' }}>
+                        <div style={{ overflow: 'hidden' }}>
+                          <p className="truncate" style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--color-text)', title: doc.name }}>{doc.name}</p>
+                          <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{new Date(doc.date).toLocaleDateString('es-MX')}</p>
+                        </div>
+                        {isEditing && (
+                          <button type="button" onClick={() => handleDeleteDocument(doc.id)} className="btn btn-outline" style={{ padding: '0.25rem', border: 'none', color: 'var(--color-danger)' }}>
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Footer Actions */}
@@ -307,7 +411,7 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
               paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom) + 5rem)' // Safe area and nav bar height buffer
             }}>
               {patient && onDelete ? (
-                <button type="button" onClick={() => onDelete(patient.id)} className="btn btn-danger" style={{ padding: '0.625rem' }} title="Eliminar paciente">
+                <button type="button" onClick={() => setIsDeleteModalOpen(true)} className="btn btn-danger" style={{ padding: '0.625rem' }} title="Eliminar paciente">
                   <Trash2 size={18} />
                 </button>
               ) : <div />}
@@ -344,6 +448,13 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
           saving={savingAppt}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => onDelete(patient.id)}
+      />
     </>
   );
 }

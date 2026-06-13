@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, CalendarDays, Users, DollarSign, Settings } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, Users, DollarSign, Settings, StickyNote } from 'lucide-react';
 
 export default function BottomNavBar() {
   const navItems = [
@@ -7,6 +7,7 @@ export default function BottomNavBar() {
     { path: '/admin/agenda', icon: CalendarDays, label: 'Agenda' },
     { path: '/admin/patients', icon: Users, label: 'Pacientes' },
     { path: '/admin/finances', icon: DollarSign, label: 'Finanzas' },
+    { path: '/admin/notes', icon: StickyNote, label: 'Notas' },
     { path: '/admin/settings', icon: Settings, label: 'Ajustes' },
   ];
 

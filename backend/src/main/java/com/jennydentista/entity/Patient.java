@@ -40,6 +40,9 @@ public class Patient {
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Appointment> appointments;
 
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<PatientDocument> documents;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();

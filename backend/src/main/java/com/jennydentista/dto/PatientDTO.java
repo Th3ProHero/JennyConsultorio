@@ -13,4 +13,5 @@ public class PatientDTO {
     private String allergies;
     private Boolean isBlacklisted;
     private LocalDateTime createdAt;
+    private java.util.List<PatientDocumentDTO> documents;
 }

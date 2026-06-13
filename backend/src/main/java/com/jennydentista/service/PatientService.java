@@ -1,12 +1,15 @@
 package com.jennydentista.service;
 
 import com.jennydentista.dto.PatientDTO;
+import com.jennydentista.dto.PatientDocumentDTO;
 import com.jennydentista.entity.Patient;
+import com.jennydentista.entity.PatientDocument;
 import com.jennydentista.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +37,22 @@ public class PatientService {
                 .insights(dto.getInsights())
                 .allergies(dto.getAllergies())
                 .isBlacklisted(dto.getIsBlacklisted() != null ? dto.getIsBlacklisted() : false)
+                .documents(new ArrayList<>())
                 .build();
+                
+        if (dto.getDocuments() != null) {
+            for (PatientDocumentDTO docDto : dto.getDocuments()) {
+                PatientDocument doc = PatientDocument.builder()
+                        .name(docDto.getName())
+                        .type(docDto.getType())
+                        .data(docDto.getData())
+                        .date(docDto.getDate())
+                        .patient(patient)
+                        .build();
+                patient.getDocuments().add(doc);
+            }
+        }
+        
         return toDTO(patientRepository.save(patient));
     }
 
@@ -49,6 +67,22 @@ public class PatientService {
         if (dto.getIsBlacklisted() != null) {
             patient.setIsBlacklisted(dto.getIsBlacklisted());
         }
+        
+        // Update documents
+        if (dto.getDocuments() != null) {
+            patient.getDocuments().clear();
+            for (PatientDocumentDTO docDto : dto.getDocuments()) {
+                PatientDocument doc = PatientDocument.builder()
+                        .name(docDto.getName())
+                        .type(docDto.getType())
+                        .data(docDto.getData())
+                        .date(docDto.getDate())
+                        .patient(patient)
+                        .build();
+                patient.getDocuments().add(doc);
+            }
+        }
+        
         return toDTO(patientRepository.save(patient));
     }
 
@@ -61,6 +95,16 @@ public class PatientService {
     }
 
     private PatientDTO toDTO(Patient p) {
+        List<PatientDocumentDTO> docs = p.getDocuments() != null ? p.getDocuments().stream()
+                .map(d -> PatientDocumentDTO.builder()
+                        .id(d.getId())
+                        .name(d.getName())
+                        .type(d.getType())
+                        .data(d.getData())
+                        .date(d.getDate())
+                        .build())
+                .toList() : new ArrayList<>();
+                
         return PatientDTO.builder()
                 .id(p.getId())
                 .name(p.getName())
@@ -70,6 +114,7 @@ public class PatientService {
                 .allergies(p.getAllergies())
                 .isBlacklisted(p.getIsBlacklisted())
                 .createdAt(p.getCreatedAt())
+                .documents(docs)
                 .build();
     }
 }

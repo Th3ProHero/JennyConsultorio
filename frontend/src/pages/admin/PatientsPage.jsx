@@ -48,14 +48,12 @@ export default function PatientsPage() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("¿Estás seguro de que deseas eliminar a este paciente definitivamente? Esta acción no se puede deshacer.")) {
-      try {
-        await deletePatient(api.deletePatient, id);
-        refetchPatients();
-        handleCloseModal();
-      } catch (err) {
-        alert("Error al eliminar paciente: " + err.message);
-      }
+    try {
+      await deletePatient(api.deletePatient, id);
+      refetchPatients();
+      handleCloseModal();
+    } catch (err) {
+      alert("Error al eliminar paciente: " + err.message);
     }
   };
 
