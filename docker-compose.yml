@@ -35,7 +35,7 @@ services:
       # solo se actualiza si hay cambios en el código.
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "false"
-      CORS_ALLOWED_ORIGINS: http://localhost:8083,http://localhost:3000
+      CORS_ALLOWED_ORIGINS: "*"
     ports:
       - "8084:8080"
     depends_on:
