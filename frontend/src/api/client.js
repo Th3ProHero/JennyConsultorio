@@ -1,5 +1,5 @@
 // client.js
-const BASE_URL = `http://${window.location.hostname}:8084/api`;
+const BASE_URL = '/api';
 
 async function fetchWithConfig(url, options = {}) {
   const response = await fetch(`${BASE_URL}${url}`, {
