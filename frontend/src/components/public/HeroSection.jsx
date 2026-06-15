@@ -81,6 +81,7 @@ export default function HeroSection({ dentists = [] }) {
               <p style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 Consultorio Dental
               </p>
+            </div>
           </div>
         </header>
 
