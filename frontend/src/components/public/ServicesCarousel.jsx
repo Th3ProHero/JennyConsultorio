@@ -9,7 +9,7 @@ export default function ServicesCarousel({ services = [], loading = false }) {
 
   const handleWhatsAppSelect = (service) => {
     const msg = encodeURIComponent(`Hola, me interesa el servicio de ${service.name}. ¿Tienen disponibilidad?`);
-    window.open(`https://wa.me/526145550101?text=${msg}`, '_blank');
+    window.open(`https://wa.me/525535756858?text=${msg}`, '_blank');
   };
 
   return (

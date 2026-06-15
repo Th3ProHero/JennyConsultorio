@@ -1,6 +1,6 @@
 import { MessageCircle } from 'lucide-react';
 
-const WHATSAPP_NUMBER = '526145550101'; // Número del consultorio
+const WHATSAPP_NUMBER = '525535756858'; // Número del consultorio
 
 export default function WhatsAppFAB({ serviceName = '' }) {
   const generateWhatsAppLink = () => {

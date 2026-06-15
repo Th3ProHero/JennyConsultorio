@@ -1,0 +1,3 @@
+networks:
+  openwa-network:
+    external: true

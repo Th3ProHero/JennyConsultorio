@@ -39,6 +39,9 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - default
+      - openwa-network
 
   # ─── React Frontend ──────────────────────────────────────
   frontend:
@@ -55,3 +58,9 @@ services:
 volumes:
   postgres_data:
     driver: local
+
+networks:
+  default:
+    driver: bridge
+  openwa-network:
+    external: true
