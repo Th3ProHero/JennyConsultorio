@@ -81,14 +81,7 @@ export default function HeroSection({ dentists = [] }) {
               <p style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 Consultorio Dental
               </p>
-            </div>
           </div>
-          <a href="/admin" className="btn btn-outline" style={{ 
-            fontSize: '0.8rem', padding: '0.5rem 1rem', 
-            borderColor: 'var(--color-accent-pink)', color: 'var(--color-accent-pink-dark)' 
-          }}>
-            Admin
-          </a>
         </header>
 
         {/* Hero Content */}

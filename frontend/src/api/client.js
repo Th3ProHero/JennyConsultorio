@@ -2,12 +2,19 @@
 const BASE_URL = '/api';
 
 async function fetchWithConfig(url, options = {}) {
+  const token = sessionStorage.getItem('jwtToken');
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {})
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   const response = await fetch(`${BASE_URL}${url}`, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {})
-    }
+    headers
   });
   
   if (!response.ok) {

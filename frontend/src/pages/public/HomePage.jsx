@@ -40,7 +40,9 @@ export default function HomePage() {
           gap: '0.5rem',
           marginBottom: '1rem'
         }}>
-          <span style={{ fontSize: '1.25rem' }}>🦷</span>
+          <Link to="/admin" style={{ textDecoration: 'none', cursor: 'default' }}>
+            <span style={{ fontSize: '1.25rem', userSelect: 'none' }}>🦷</span>
+          </Link>
           <span style={{ fontWeight: 700, color: 'var(--color-primary-dark)' }}>
             Jenny Dentista
           </span>

@@ -8,14 +8,25 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Generic hardcoded credentials for now as requested
-    if (username === 'admin' && password === 'jenny123') {
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Usuario o contraseña incorrectos');
+      }
+      
+      const data = await response.json();
+      sessionStorage.setItem('jwtToken', data.token);
       sessionStorage.setItem('isAdminAuthenticated', 'true');
       navigate('/admin');
-    } else {
-      setError('Usuario o contraseña incorrectos');
+    } catch (err) {
+      setError(err.message);
     }
   };
 
