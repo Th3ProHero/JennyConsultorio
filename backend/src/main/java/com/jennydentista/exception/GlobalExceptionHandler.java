@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
                 "timestamp", LocalDateTime.now().toString(),
                 "status", HttpStatus.BAD_REQUEST.value(),
                 "error", "Bad Request",
-                "message", "El archivo excede el tamaño máximo permitido (15 MB)."
+                "message", "El archivo excede el limite maximo permitido (15 MB)."
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
                 "timestamp", LocalDateTime.now().toString(),
                 "status", HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "error", "Internal Server Error",
-                "message", "Ocurrió un error inesperado. Intente nuevamente."
+                "message", "Ocurrio un error inesperado. Intente nuevamente."
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }

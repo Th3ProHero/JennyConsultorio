@@ -65,7 +65,7 @@ VALUES (14, 'Consulta de Emergencia', 'Atención prioritaria para alivio de dolo
 ON CONFLICT (id) DO NOTHING;
 
 -- Reset sequences to avoid conflicts with future inserts
-SELECT setval('dentists_id_seq', (SELECT MAX(id) FROM dentists));
-SELECT setval('patients_id_seq', (SELECT MAX(id) FROM patients));
-SELECT setval('services_id_seq', (SELECT MAX(id) FROM services));
-SELECT setval('appointments_id_seq', (SELECT MAX(id) FROM appointments));
+SELECT setval('dentists_id_seq', COALESCE((SELECT MAX(id) FROM dentists), 1));
+SELECT setval('patients_id_seq', COALESCE((SELECT MAX(id) FROM patients), 1));
+SELECT setval('services_id_seq', COALESCE((SELECT MAX(id) FROM services), 1));
+SELECT setval('appointments_id_seq', COALESCE((SELECT MAX(id) FROM appointments), 1));
