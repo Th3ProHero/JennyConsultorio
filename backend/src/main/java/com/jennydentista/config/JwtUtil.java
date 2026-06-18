@@ -16,8 +16,10 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    // Generate a secure key for HS256
-    private final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    // Fixed secret key so restarts don't invalidate existing tokens
+    // 256-bit key for HS256, encoded in Base64
+    private final String SECRET = "JENNY_DENTISTA_SECURE_KEY_2024_MUST_BE_LONG_ENOUGH_FOR_HS256_ALGORITHM";
+    private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

@@ -27,7 +27,11 @@ async function fetchWithConfig(url, options = {}) {
         errorMsg = errorJson.message || errorMsg;
       } catch {
         // Not JSON (e.g. HTML error page from proxy) — use a clean message
-        if (response.status === 502) {
+        if (response.status === 401 || response.status === 403) {
+          sessionStorage.removeItem('jwtToken');
+          window.location.href = '/';
+          errorMsg = 'Sesión expirada. Por favor inicie sesión nuevamente.';
+        } else if (response.status === 502) {
           errorMsg = 'El servidor no está disponible. Intente nuevamente.';
         } else {
           errorMsg = `Error ${response.status}: ${response.statusText || errorMsg}`;
@@ -70,7 +74,11 @@ async function fetchWithFormData(url, formData) {
         const errorJson = JSON.parse(text);
         errorMsg = errorJson.message || errorMsg;
       } catch {
-        if (response.status === 413) {
+        if (response.status === 401 || response.status === 403) {
+          sessionStorage.removeItem('jwtToken');
+          window.location.href = '/';
+          errorMsg = 'Sesión expirada. Por favor inicie sesión nuevamente.';
+        } else if (response.status === 413) {
           errorMsg = 'El archivo excede el tamaño máximo permitido (15 MB).';
         } else {
           errorMsg = `Error ${response.status}: ${response.statusText || errorMsg}`;
