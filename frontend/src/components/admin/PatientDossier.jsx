@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Camera, Trash2, AlertTriangle, X, ExternalLink, FileText, Image as ImageIcon, ArrowLeft } from 'lucide-react';
 import { api } from '../../api/client';
 import './PatientDossier.css';
@@ -401,8 +402,8 @@ export default function PatientDossier({ patientId }) {
         </>
       )}
 
-      {/* ──── Lightbox (Fullscreen Viewer) ──── */}
-      {lightboxDoc && (
+      {/* ──── Lightbox (Fullscreen Viewer) — rendered via Portal to escape modal overflow ──── */}
+      {lightboxDoc && createPortal(
         <div className="dossier-lightbox" onClick={() => setLightboxDoc(null)}>
           <div className="dossier-lightbox-header" onClick={e => e.stopPropagation()}>
             {/* Back Button */}
@@ -460,11 +461,12 @@ export default function PatientDossier({ patientId }) {
               {lightboxDoc.name} · {formatDate(lightboxDoc.date)}
             </span>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* ──── Delete Confirmation Modal ──── */}
-      {deleteConfirmId && (
+      {/* ──── Delete Confirmation Modal — rendered via Portal ──── */}
+      {deleteConfirmId && createPortal(
         <div className="dossier-delete-overlay" onClick={() => setDeleteConfirmId(null)}>
           <div className="dossier-delete-dialog" onClick={e => e.stopPropagation()}>
             <AlertTriangle size={40} color="var(--color-warning)" />
@@ -487,7 +489,8 @@ export default function PatientDossier({ patientId }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
