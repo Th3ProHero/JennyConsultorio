@@ -17,4 +17,10 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    sourcemap: false, // Ocultar código fuente original en producción
+  },
+  esbuild: {
+    drop: ['console', 'debugger'], // Eliminar todos los logs en producción
+  },
 });
