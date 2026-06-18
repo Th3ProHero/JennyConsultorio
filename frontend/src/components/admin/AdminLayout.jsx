@@ -71,7 +71,7 @@ export default function AdminLayout() {
       {/* Main Content Area */}
       <main style={{
         flex: 1,
-        padding: '1rem 1rem calc(65px + 1.5rem + env(safe-area-inset-bottom))',
+        padding: '3.75rem 1rem calc(65px + 1.5rem + env(safe-area-inset-bottom))',
         maxWidth: '800px',
         margin: '0 auto',
         width: '100%',
