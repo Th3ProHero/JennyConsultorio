@@ -19,12 +19,22 @@ async function fetchWithConfig(url, options = {}) {
   
   if (!response.ok) {
     // Try to parse JSON error body from GlobalExceptionHandler
-    let errorMsg;
+    let errorMsg = 'Error de conexión con el servidor';
     try {
-      const errorJson = await response.json();
-      errorMsg = errorJson.message || 'Error de conexión con el servidor';
+      const text = await response.text();
+      try {
+        const errorJson = JSON.parse(text);
+        errorMsg = errorJson.message || errorMsg;
+      } catch {
+        // Not JSON (e.g. HTML error page from proxy) — use a clean message
+        if (response.status === 502) {
+          errorMsg = 'El servidor no está disponible. Intente nuevamente.';
+        } else {
+          errorMsg = `Error ${response.status}: ${response.statusText || errorMsg}`;
+        }
+      }
     } catch {
-      errorMsg = await response.text().catch(() => 'Error de conexión con el servidor');
+      // Could not read response body at all
     }
     throw new Error(errorMsg);
   }
@@ -53,12 +63,21 @@ async function fetchWithFormData(url, formData) {
   });
 
   if (!response.ok) {
-    let errorMsg;
+    let errorMsg = 'Error al subir el archivo';
     try {
-      const errorJson = await response.json();
-      errorMsg = errorJson.message || 'Error al subir el archivo';
+      const text = await response.text();
+      try {
+        const errorJson = JSON.parse(text);
+        errorMsg = errorJson.message || errorMsg;
+      } catch {
+        if (response.status === 413) {
+          errorMsg = 'El archivo excede el tamaño máximo permitido (15 MB).';
+        } else {
+          errorMsg = `Error ${response.status}: ${response.statusText || errorMsg}`;
+        }
+      }
     } catch {
-      errorMsg = await response.text().catch(() => 'Error al subir el archivo');
+      // Could not read response body
     }
     throw new Error(errorMsg);
   }

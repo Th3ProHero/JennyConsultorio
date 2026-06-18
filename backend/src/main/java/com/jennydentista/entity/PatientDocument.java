@@ -2,6 +2,8 @@ package com.jennydentista.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,8 +26,8 @@ public class PatientDocument {
     @Column(columnDefinition = "TEXT")
     private String data; // Legacy Base64 Data URL — kept for backward compatibility
 
-    @Lob
-    @Column(columnDefinition = "BYTEA")
+    @JdbcTypeCode(SqlTypes.BINARY)
+    @Column(name = "file_data", columnDefinition = "BYTEA")
     private byte[] fileData; // Raw binary data stored directly in PostgreSQL
 
     @Column(name = "mime_type", length = 100)
