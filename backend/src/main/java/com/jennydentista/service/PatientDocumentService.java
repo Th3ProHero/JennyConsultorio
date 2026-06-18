@@ -69,6 +69,7 @@ public class PatientDocumentService {
         PatientDocument doc = PatientDocument.builder()
                 .name(file.getOriginalFilename())
                 .type(contentType)
+                .data("") // Default empty string to avoid "not-null constraint" on legacy databases
                 .mimeType(contentType)
                 .fileData(file.getBytes())
                 .tag(tag)
