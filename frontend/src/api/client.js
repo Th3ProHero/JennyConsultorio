@@ -138,7 +138,7 @@ export const api = {
 
   // ── Appointments ──
   getAllAppointments: () => fetchWithConfig('/admin/appointments'),
-  getAppointmentsByDate: (date) => fetchWithConfig(`/admin/appointments/date/${date}`),
+  getAppointmentsByDate: (date) => fetchWithConfig(`/admin/appointments/by-date?date=${date}`),
   createAppointment: (data) => fetchWithConfig('/admin/appointments', { method: 'POST', body: JSON.stringify(data) }),
   updateAppointment: (id, data) => fetchWithConfig(`/admin/appointments/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteAppointment: (id) => fetchWithConfig(`/admin/appointments/${id}`, { method: 'DELETE' }),
