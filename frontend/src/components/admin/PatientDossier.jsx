@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Camera, Trash2, AlertTriangle, X, ExternalLink, FileText, Image as ImageIcon } from 'lucide-react';
+import { Camera, Trash2, AlertTriangle, X, ExternalLink, FileText, Image as ImageIcon, ArrowLeft } from 'lucide-react';
 import { api } from '../../api/client';
 import './PatientDossier.css';
 
@@ -347,7 +347,14 @@ export default function PatientDossier({ patientId }) {
                   style={{ animationDelay: `${idx * 0.05}s` }}
                 >
                   {/* Thumbnail */}
-                  <div className="dossier-card-img" onClick={() => setLightboxDoc(doc)}>
+                  <div className="dossier-card-img" onClick={() => {
+                    if (!isImage && blobUrls[doc.id]) {
+                      // PDFs open directly in a new tab (better mobile support)
+                      window.open(blobUrls[doc.id], '_blank');
+                    } else {
+                      setLightboxDoc(doc);
+                    }
+                  }}>
                     {blobUrls[doc.id] ? (
                       isImage ? (
                         <img src={blobUrls[doc.id]} alt={doc.name} loading="lazy" />
@@ -398,25 +405,24 @@ export default function PatientDossier({ patientId }) {
       {lightboxDoc && (
         <div className="dossier-lightbox" onClick={() => setLightboxDoc(null)}>
           <div className="dossier-lightbox-header" onClick={e => e.stopPropagation()}>
-            <span
-              className="dossier-tag-badge"
-              style={{
-                background: (TAG_COLORS[lightboxDoc.tag] || TAG_COLORS.OTROS).bg,
-                color: (TAG_COLORS[lightboxDoc.tag] || TAG_COLORS.OTROS).color,
-                borderColor: (TAG_COLORS[lightboxDoc.tag] || TAG_COLORS.OTROS).border,
-                fontSize: '0.75rem',
-                padding: '0.25rem 0.625rem',
-              }}
+            {/* Back Button */}
+            <button
+              className="dossier-lightbox-back-btn"
+              onClick={() => setLightboxDoc(null)}
+              aria-label="Volver"
             >
-              {TAG_ICONS[lightboxDoc.tag] || '📎'} {TAG_LABELS[lightboxDoc.tag] || 'Otros'}
-            </span>
+              <ArrowLeft size={20} />
+              <span>Volver</span>
+            </button>
             <div className="dossier-lightbox-actions">
-              <button
-                className="dossier-lightbox-open-btn"
-                onClick={() => handleOpenNewTab(lightboxDoc)}
-              >
-                <ExternalLink size={16} /> Abrir
-              </button>
+              {lightboxDoc.mimeType?.startsWith('image/') && (
+                <button
+                  className="dossier-lightbox-open-btn"
+                  onClick={() => handleOpenNewTab(lightboxDoc)}
+                >
+                  <ExternalLink size={16} /> Abrir
+                </button>
+              )}
               <button
                 className="dossier-lightbox-close"
                 onClick={() => setLightboxDoc(null)}
@@ -428,25 +434,31 @@ export default function PatientDossier({ patientId }) {
           </div>
           <div className="dossier-lightbox-body" onClick={e => e.stopPropagation()}>
             {blobUrls[lightboxDoc.id] ? (
-              lightboxDoc.mimeType?.startsWith('image/') ? (
-                <img
-                  src={blobUrls[lightboxDoc.id]}
-                  alt={lightboxDoc.name}
-                  className="dossier-lightbox-img"
-                />
-              ) : (
-                <iframe
-                  src={blobUrls[lightboxDoc.id]}
-                  title={lightboxDoc.name}
-                  className="dossier-lightbox-pdf"
-                />
-              )
+              <img
+                src={blobUrls[lightboxDoc.id]}
+                alt={lightboxDoc.name}
+                className="dossier-lightbox-img"
+              />
             ) : (
               <div className="dossier-loading-pulse" style={{ width: 60, height: 60 }} />
             )}
           </div>
           <div className="dossier-lightbox-info" onClick={e => e.stopPropagation()}>
-            {lightboxDoc.name} · {formatDate(lightboxDoc.date)}
+            <span
+              className="dossier-tag-badge"
+              style={{
+                background: (TAG_COLORS[lightboxDoc.tag] || TAG_COLORS.OTROS).bg,
+                color: (TAG_COLORS[lightboxDoc.tag] || TAG_COLORS.OTROS).color,
+                borderColor: (TAG_COLORS[lightboxDoc.tag] || TAG_COLORS.OTROS).border,
+                fontSize: '0.7rem',
+                padding: '0.2rem 0.5rem',
+              }}
+            >
+              {TAG_ICONS[lightboxDoc.tag] || '📎'} {TAG_LABELS[lightboxDoc.tag] || 'Otros'}
+            </span>
+            <span className="dossier-lightbox-info-text">
+              {lightboxDoc.name} · {formatDate(lightboxDoc.date)}
+            </span>
           </div>
         </div>
       )}
