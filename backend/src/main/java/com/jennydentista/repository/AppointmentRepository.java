@@ -40,7 +40,4 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                                               @Param("end") LocalDateTime end);
 
     List<Appointment> findByPatientIdOrderByScheduledDateDesc(Long patientId);
-
-    @Query("SELECT a FROM Appointment a WHERE a.scheduledDate BETWEEN :start AND :end AND a.reminderSent = false AND (a.status = 'PENDING' OR a.status = 'CONFIRMED')")
-    List<Appointment> findUpcomingAppointmentsForReminder(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }

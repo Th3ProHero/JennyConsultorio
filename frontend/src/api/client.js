@@ -18,14 +18,69 @@ async function fetchWithConfig(url, options = {}) {
   });
   
   if (!response.ok) {
-    const errorMsg = await response.text();
-    throw new Error(errorMsg || 'Error de conexión con el servidor');
+    // Try to parse JSON error body from GlobalExceptionHandler
+    let errorMsg;
+    try {
+      const errorJson = await response.json();
+      errorMsg = errorJson.message || 'Error de conexión con el servidor';
+    } catch {
+      errorMsg = await response.text().catch(() => 'Error de conexión con el servidor');
+    }
+    throw new Error(errorMsg);
   }
   
   // Si la respuesta es 204 No Content
   if (response.status === 204) return null;
   
   return response.json();
+}
+
+/**
+ * Sends a multipart/form-data request. Used for file uploads.
+ * Does NOT set Content-Type header — the browser sets it automatically with the boundary.
+ */
+async function fetchWithFormData(url, formData) {
+  const token = sessionStorage.getItem('jwtToken');
+  const headers = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${BASE_URL}${url}`, {
+    method: 'POST',
+    headers,
+    body: formData
+  });
+
+  if (!response.ok) {
+    let errorMsg;
+    try {
+      const errorJson = await response.json();
+      errorMsg = errorJson.message || 'Error al subir el archivo';
+    } catch {
+      errorMsg = await response.text().catch(() => 'Error al subir el archivo');
+    }
+    throw new Error(errorMsg);
+  }
+
+  if (response.status === 204) return null;
+  return response.json();
+}
+
+/**
+ * Fetches a binary blob (used for authenticated file serving).
+ * Returns a Blob that can be turned into an object URL for rendering.
+ */
+async function fetchBlob(url) {
+  const token = sessionStorage.getItem('jwtToken');
+  const headers = {};
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${BASE_URL}${url}`, { headers });
+  if (!response.ok) throw new Error('Error al cargar el documento');
+  return response.blob();
 }
 
 export const api = {
@@ -66,4 +121,15 @@ export const api = {
   createNote: (data) => fetchWithConfig('/admin/notes', { method: 'POST', body: JSON.stringify(data) }),
   updateNote: (id, data) => fetchWithConfig(`/admin/notes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteNote: (id) => fetchWithConfig(`/admin/notes/${id}`, { method: 'DELETE' }),
+
+  // ── Patient Documents (Expediente Médico) ──
+  uploadPatientDocument: (patientId, file, tag) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('tag', tag);
+    return fetchWithFormData(`/admin/patients/${patientId}/documents`, formData);
+  },
+  getPatientDocuments: (patientId) => fetchWithConfig(`/admin/patients/${patientId}/documents`),
+  getPatientDocumentBlob: (docId) => fetchBlob(`/admin/documents/${docId}/file`),
+  deletePatientDocument: (docId) => fetchWithConfig(`/admin/documents/${docId}`, { method: 'DELETE' }),
 };

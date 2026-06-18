@@ -100,7 +100,9 @@ public class PatientService {
                         .id(d.getId())
                         .name(d.getName())
                         .type(d.getType())
-                        .data(d.getData())
+                        .mimeType(d.getMimeType() != null ? d.getMimeType() : d.getType())
+                        .tag(d.getTag() != null ? d.getTag().name() : "OTROS")
+                        .fileUrl("/api/admin/documents/" + d.getId() + "/file")
                         .date(d.getDate())
                         .build())
                 .toList() : new ArrayList<>();

@@ -34,15 +34,13 @@ services:
       # solo se actualiza si hay cambios en el código.
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "false"
+      SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: "15MB"
+      SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE: "15MB"
       CORS_ALLOWED_ORIGINS: "*"
-      OPENWA_API_KEY: "jenny_dentista_123"
 
     depends_on:
       postgres:
         condition: service_healthy
-    networks:
-      - default
-      - openwa-network
 
   # ─── React Frontend ──────────────────────────────────────
   frontend:
@@ -63,5 +61,3 @@ volumes:
 networks:
   default:
     driver: bridge
-  openwa-network:
-    external: true

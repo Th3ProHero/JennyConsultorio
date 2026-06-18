@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Trash2, AlertTriangle, Calendar, Clock, MapPin, Edit2, FileText, Upload, Image as ImageIcon } from 'lucide-react';
+import { X, Trash2, AlertTriangle, Calendar, Clock, MapPin, Edit2 } from 'lucide-react';
 import { getRelativeTime } from '../../utils/dateFormatter';
 import AppointmentForm from './AppointmentForm';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
+import PatientDossier from './PatientDossier';
 import { useApi } from '../../hooks/useApi';
 import { api } from '../../api/client';
 
@@ -57,47 +58,12 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!isEditing) return;
-    onSave(formData);
+    // Exclude documents from patient save — they are managed independently by PatientDossier
+    const { documents, ...patientData } = formData;
+    onSave(patientData);
   };
 
-  const handleFileUpload = (e) => {
-    if (!isEditing) return;
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      alert("El archivo es demasiado grande (máximo 5MB).");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormData(prev => ({
-        ...prev,
-        documents: [
-          ...prev.documents,
-          { 
-            id: Date.now(), 
-            name: file.name, 
-            type: file.type, 
-            data: reader.result, 
-            date: new Date().toISOString() 
-          }
-        ]
-      }));
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleDeleteDocument = (id) => {
-    if (!isEditing) return;
-    if (window.confirm("¿Seguro que deseas eliminar este documento?")) {
-      setFormData(prev => ({
-        ...prev,
-        documents: prev.documents.filter(doc => doc.id !== id)
-      }));
-    }
-  };
+  // Document upload and delete are now handled by the PatientDossier component
 
   const handleApptSave = async (apptData) => {
     try {
@@ -346,59 +312,9 @@ export default function PatientForm({ patient, allAppointments, onSave, onClose,
               )}
             </div>
 
-            {/* TAB: DOCUMENTOS */}
+            {/* TAB: DOCUMENTOS — Managed by PatientDossier */}
             <div style={{ display: activeTab === 'documentos' ? 'block' : 'none' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text)' }}>Radiografías y Documentos</h4>
-                {isEditing && (
-                  <div>
-                    <input 
-                      type="file" 
-                      id="fileUpload" 
-                      style={{ display: 'none' }} 
-                      accept="image/*,application/pdf"
-                      onChange={handleFileUpload} 
-                    />
-                    <label htmlFor="fileUpload" className="btn btn-primary" style={{ cursor: 'pointer', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <Upload size={16} /> Subir Archivo
-                    </label>
-                  </div>
-                )}
-              </div>
-
-              {formData.documents.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--color-text-muted)' }}>
-                  <ImageIcon size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-                  <p>Este paciente no tiene documentos o radiografías.</p>
-                </div>
-              ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-                  {formData.documents.map(doc => (
-                    <div key={doc.id} className="card" style={{ padding: '0', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                      {doc.type.startsWith('image/') ? (
-                        <div style={{ height: '140px', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                          <img src={doc.data} alt={doc.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                        </div>
-                      ) : (
-                        <div style={{ height: '140px', background: 'var(--color-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)' }}>
-                          <FileText size={48} />
-                        </div>
-                      )}
-                      <div style={{ padding: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--color-border)' }}>
-                        <div style={{ overflow: 'hidden' }}>
-                          <p className="truncate" style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--color-text)', title: doc.name }}>{doc.name}</p>
-                          <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{new Date(doc.date).toLocaleDateString('es-MX')}</p>
-                        </div>
-                        {isEditing && (
-                          <button type="button" onClick={() => handleDeleteDocument(doc.id)} className="btn btn-outline" style={{ padding: '0.25rem', border: 'none', color: 'var(--color-danger)' }}>
-                            <Trash2 size={16} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              {patient && <PatientDossier patientId={patient.id} />}
             </div>
           </div>
 

@@ -9,7 +9,10 @@ import java.time.LocalDateTime;
 public class PatientDocumentDTO {
     private Long id;
     private String name;
-    private String type;
-    private String data;
+    private String type;      // Legacy MIME type field
+    private String data;      // Legacy Base64 data (only used in old create/update flows)
+    private String mimeType;  // MIME type for new uploads
+    private String tag;       // DocumentTag enum name (RAYOS_X, RECETA_MEDICA, etc.)
+    private String fileUrl;   // Computed URL to serve the document binary
     private LocalDateTime date;
 }
