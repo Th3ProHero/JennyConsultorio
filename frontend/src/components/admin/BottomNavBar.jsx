@@ -39,6 +39,7 @@ export default function BottomNavBar() {
               to={item.path}
               end={item.end}
               style={({ isActive }) => ({
+                position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',

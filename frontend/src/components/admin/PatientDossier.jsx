@@ -110,9 +110,14 @@ export default function PatientDossier({ patientId }) {
   }, [documents]);
 
   // ─── Cleanup blob URLs on unmount ──────────────────────
+  const blobUrlsRef = useRef({});
+  useEffect(() => {
+    blobUrlsRef.current = blobUrls;
+  }, [blobUrls]);
+
   useEffect(() => {
     return () => {
-      Object.values(blobUrls).forEach(url => URL.revokeObjectURL(url));
+      Object.values(blobUrlsRef.current).forEach(url => URL.revokeObjectURL(url));
     };
   }, []);
 

@@ -10,20 +10,23 @@ export default function FinancesPage() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  const { data: dashboard, loading } = useFetch(() => api.getDashboard(selectedMonth, selectedYear), [selectedMonth, selectedYear]);
+  const { data: dashboard, loading: dashboardLoading } = useFetch(() => api.getDashboard(selectedMonth, selectedYear), [selectedMonth, selectedYear]);
+  const { data: allAppointments, loading: apptsLoading } = useFetch(api.getAllAppointments);
   
   const [completedAppts, setCompletedAppts] = useState([]);
 
   useEffect(() => {
-    const allAppts = JSON.parse(localStorage.getItem('mockAppointments')) || [];
-    const completed = allAppts
+    if (!allAppointments) return;
+    const completed = allAppointments
       .filter(a => {
         const d = new Date(a.scheduledDate);
         return a.status === 'COMPLETED' && d.getMonth() === selectedMonth && d.getFullYear() === selectedYear;
       })
       .sort((a, b) => new Date(b.scheduledDate) - new Date(a.scheduledDate));
     setCompletedAppts(completed);
-  }, [dashboard, selectedMonth, selectedYear]);
+  }, [allAppointments, selectedMonth, selectedYear]);
+
+  const loading = dashboardLoading || apptsLoading;
 
   const formatCurrency = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val);
 

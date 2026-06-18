@@ -58,15 +58,18 @@ export default function PatientsPage() {
   };
 
   // Pre-calcular la última cita completada para cada paciente
-  const getLastAppointment = (patientId) => {
-    if (!allAppointments) return null;
-    const patientAppts = allAppointments.filter(a => a.patientId === patientId && a.status === 'COMPLETED');
-    if (patientAppts.length === 0) return null;
-    
-    // Ordenar de más reciente a más antigua
-    patientAppts.sort((a, b) => new Date(b.scheduledDate) - new Date(a.scheduledDate));
-    return patientAppts[0];
-  };
+  const lastApptMap = useMemo(() => {
+    if (!allAppointments) return {};
+    const map = {};
+    const completed = allAppointments.filter(a => a.status === 'COMPLETED');
+    completed.sort((a, b) => new Date(b.scheduledDate) - new Date(a.scheduledDate));
+    completed.forEach(a => {
+      if (!map[a.patientId]) {
+        map[a.patientId] = a;
+      }
+    });
+    return map;
+  }, [allAppointments]);
 
   return (
     <div className="animate-fade-in pb-24 min-h-screen overflow-x-hidden">
@@ -103,7 +106,7 @@ export default function PatientsPage() {
           <LoadingSpinner text="Cargando pacientes..." />
         ) : filteredPatients && filteredPatients.length > 0 ? (
           filteredPatients.map(patient => {
-            const lastAppt = getLastAppointment(patient.id);
+            const lastAppt = lastApptMap[patient.id];
             return (
             <div 
               key={patient.id} 

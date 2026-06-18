@@ -176,7 +176,7 @@ body {
 .input {
   width: 100%;
   padding: 0.75rem 1rem;
-  font-size: 0.9375rem;
+  font-size: 1rem; /* 16px prevents iOS auto-zoom */
   font-family: 'Inter', sans-serif;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
