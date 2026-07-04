@@ -1,22 +1,15 @@
 import { MapPin, Navigation, Clock } from 'lucide-react';
+import { useFetch } from '../../hooks/useFetch';
+import { api } from '../../api/client';
 
 export default function ClinicsSection() {
-  const clinics = [
-    {
-      id: 1,
-      name: 'Consultorio Constitución',
-      address: 'Margarita 59, Los Ángeles, Iztapalapa, 09830 Ciudad de México, CDMX',
-      hours: 'Lunes a Viernes: Previa Cita',
-      mapUrl: 'https://www.google.com/maps/place/Margarita+59,+Los+Ángeles,+Iztapalapa,+09830+Ciudad+de+México,+CDMX/@19.3462199,-99.0683456,15z/data=!4m6!3m5!1s0x85d1fd889b87e067:0x65b8117af0c51335!8m2!3d19.3462774!4d-99.0684851!16s%2Fg%2F11csnb5nv2?entry=ttu&g_ep=EgoyMDI2MDYwMy4xIKXMDSoASAFQAw%3D%3D',
-    },
-    {
-      id: 2,
-      name: 'Consultorio Citlali',
-      address: 'Constitución & Fresno, Citlalli, Iztapalapa, 09660 Ciudad de México, CDMX',
-      hours: 'Lunes a Viernes: Previa Cita',
-      mapUrl: 'https://maps.app.goo.gl/NjZKpND7yn8Be8co8',
-    }
-  ];
+  const { data: clinics, loading } = useFetch(api.getPublicClinics);
+
+  const displayClinics = clinics && clinics.length > 0 ? clinics : [];
+
+  if (loading) return null; // Silently wait; HeroSection already shows a full spinner
+
+  if (displayClinics.length === 0) return null; // Hide section if no clinics configured
 
   return (
     <section id="consultorios" style={{
@@ -44,7 +37,9 @@ export default function ClinicsSection() {
             fontSize: '0.9375rem', color: 'var(--color-text-muted)',
             maxWidth: '500px', margin: '0.75rem auto 0',
           }}>
-            Contamos con dos ubicaciones estratégicas equipadas con la mejor tecnología para tu comodidad.
+            {displayClinics.length === 1
+              ? 'Contamos con una ubicación equipada con la mejor tecnología para tu comodidad.'
+              : `Contamos con ${displayClinics.length} ubicaciones estratégicas equipadas con la mejor tecnología para tu comodidad.`}
           </p>
         </div>
 
@@ -52,10 +47,10 @@ export default function ClinicsSection() {
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
           gap: '2rem',
-          maxWidth: '800px',
+          maxWidth: displayClinics.length === 1 ? '420px' : '800px',
           margin: '0 auto'
         }}>
-          {clinics.map((clinic) => (
+          {displayClinics.map((clinic) => (
             <div key={clinic.id} className="card" style={{ 
               padding: '2rem', 
               display: 'flex', 
@@ -88,25 +83,29 @@ export default function ClinicsSection() {
                   <MapPin size={16} style={{ marginTop: '0.15rem', flexShrink: 0 }} />
                   {clinic.address}
                 </p>
-                <p style={{ fontSize: '0.9375rem', color: 'var(--color-text-muted)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                  <Clock size={16} />
-                  {clinic.hours}
-                </p>
+                {clinic.hours && (
+                  <p style={{ fontSize: '0.9375rem', color: 'var(--color-text-muted)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <Clock size={16} />
+                    {clinic.hours}
+                  </p>
+                )}
               </div>
 
-              <a 
-                href={clinic.mapUrl} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="btn btn-outline" 
-                style={{ 
-                  marginTop: '1rem', 
-                  borderColor: 'var(--color-primary-light)', 
-                  color: 'var(--color-primary-dark)' 
-                }}
-              >
-                <Navigation size={16} /> Ver en Google Maps
-              </a>
+              {clinic.mapUrl && (
+                <a 
+                  href={clinic.mapUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="btn btn-outline" 
+                  style={{ 
+                    marginTop: '1rem', 
+                    borderColor: 'var(--color-primary-light)', 
+                    color: 'var(--color-primary-dark)' 
+                  }}
+                >
+                  <Navigation size={16} /> Ver en Google Maps
+                </a>
+              )}
             </div>
           ))}
         </div>

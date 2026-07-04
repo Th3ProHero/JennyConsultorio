@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import BottomNavBar from './BottomNavBar';
-import { Globe, LogOut, UserRound } from 'lucide-react';
+import { Globe, LogOut, UserRound, MapPin } from 'lucide-react';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -62,6 +62,13 @@ export default function AdminLayout() {
             >
               <UserRound size={16} />
               About Me
+            </button>
+            <button
+              className="admin-fab-menu-item"
+              onClick={() => { setMenuOpen(false); navigate('/admin/clinics'); }}
+            >
+              <MapPin size={16} />
+              Consultorios
             </button>
             <button
               className="admin-fab-menu-item"

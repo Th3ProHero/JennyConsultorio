@@ -14,6 +14,31 @@ SET bio = 'Odontóloga especialista apasionada por crear sonrisas hermosas y sal
 WHERE id = 1
   AND (bio IS NULL OR whatsapp_number IS NULL);
 
+-- Clinics
+INSERT INTO clinics (id, name, address, hours, map_url, sort_order, created_at)
+VALUES (
+  1,
+  'Consultorio Constitución',
+  'Margarita 59, Los Ángeles, Iztapalapa, 09830 Ciudad de México, CDMX',
+  'Lunes a Viernes: Previa Cita',
+  'https://www.google.com/maps/place/Margarita+59,+Los+Ángeles,+Iztapalapa,+09830+Ciudad+de+México,+CDMX/@19.3462199,-99.0683456,15z/data=!4m6!3m5!1s0x85d1fd889b87e067:0x65b8117af0c51335!8m2!3d19.3462774!4d-99.0684851!16s%2Fg%2F11csnb5nv2?entry=ttu&g_ep=EgoyMDI2MDYwMy4xIKXMDSoASAFQAw%3D%3D',
+  0,
+  NOW()
+) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO clinics (id, name, address, hours, map_url, sort_order, created_at)
+VALUES (
+  2,
+  'Consultorio Citlali',
+  'Constitución & Fresno, Citlalli, Iztapalapa, 09660 Ciudad de México, CDMX',
+  'Lunes a Viernes: Previa Cita',
+  'https://maps.app.goo.gl/NjZKpND7yn8Be8co8',
+  1,
+  NOW()
+) ON CONFLICT (id) DO NOTHING;
+
+
+
 -- Services
 INSERT INTO services (id, name, description, base_price, original_price, is_promotion)
 VALUES (1, 'Limpieza Dental', 'Limpieza profunda con ultrasonido y pulido', 800.00, NULL, false)
@@ -76,3 +101,5 @@ SELECT setval('dentists_id_seq', COALESCE((SELECT MAX(id) FROM dentists), 1));
 SELECT setval('patients_id_seq', COALESCE((SELECT MAX(id) FROM patients), 1));
 SELECT setval('services_id_seq', COALESCE((SELECT MAX(id) FROM services), 1));
 SELECT setval('appointments_id_seq', COALESCE((SELECT MAX(id) FROM appointments), 1));
+SELECT setval('clinics_id_seq', COALESCE((SELECT MAX(id) FROM clinics), 1));
+

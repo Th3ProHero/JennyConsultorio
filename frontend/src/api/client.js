@@ -125,6 +125,15 @@ export const api = {
   getAdminDentists: () => fetchWithConfig('/admin/dentists'),
   updateDentist: (id, data) => fetchWithConfig(`/admin/dentists/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
 
+  // ── Public Clinics ──
+  getPublicClinics: () => fetchWithConfig('/public/clinics'),
+
+  // ── Admin Clinics (Consultorios) ──
+  getAdminClinics: () => fetchWithConfig('/admin/clinics'),
+  createClinic: (data) => fetchWithConfig('/admin/clinics', { method: 'POST', body: JSON.stringify(data) }),
+  updateClinic: (id, data) => fetchWithConfig(`/admin/clinics/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteClinic: (id) => fetchWithConfig(`/admin/clinics/${id}`, { method: 'DELETE' }),
+
   // ── Dashboard ──
   getDashboard: (month, year) => {
     let query = '';

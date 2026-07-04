@@ -10,6 +10,7 @@ import SettingsPage from './pages/admin/SettingsPage';
 import NotesPage from './pages/admin/NotesPage';
 import LoginPage from './pages/admin/LoginPage';
 import AboutMePage from './pages/admin/AboutMePage';
+import ClinicsPage from './pages/admin/ClinicsPage';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="settings" element={<SettingsPage />} />
           <Route path="notes" element={<NotesPage />} />
           <Route path="about" element={<AboutMePage />} />
+          <Route path="clinics" element={<ClinicsPage />} />
         </Route>
       </Route>
     </Routes>
