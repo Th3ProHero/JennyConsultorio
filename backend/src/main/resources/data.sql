@@ -7,6 +7,13 @@ INSERT INTO dentists (id, name, specialty, phone, created_at)
 VALUES (1, 'Jenny F.', 'Odontología General y Estética', '+52 614 555 0101', NOW())
 ON CONFLICT (id) DO NOTHING;
 
+-- Set default bio and whatsapp_number if they are null (for existing rows)
+UPDATE dentists
+SET bio = 'Odontóloga especialista apasionada por crear sonrisas hermosas y saludables. Te brindamos un trato cálido, honesto y con la mejor tecnología dental.',
+    whatsapp_number = '+52 5511965133'
+WHERE id = 1
+  AND (bio IS NULL OR whatsapp_number IS NULL);
+
 -- Services
 INSERT INTO services (id, name, description, base_price, original_price, is_promotion)
 VALUES (1, 'Limpieza Dental', 'Limpieza profunda con ultrasonido y pulido', 800.00, NULL, false)

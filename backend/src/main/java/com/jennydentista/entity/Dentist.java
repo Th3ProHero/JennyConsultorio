@@ -25,6 +25,12 @@ public class Dentist {
     @Column(length = 20)
     private String phone;
 
+    @Column(length = 500)
+    private String bio;
+
+    @Column(name = "whatsapp_number", length = 25)
+    private String whatsappNumber;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

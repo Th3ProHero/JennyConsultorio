@@ -9,6 +9,7 @@ import FinancesPage from './pages/admin/FinancesPage';
 import SettingsPage from './pages/admin/SettingsPage';
 import NotesPage from './pages/admin/NotesPage';
 import LoginPage from './pages/admin/LoginPage';
+import AboutMePage from './pages/admin/AboutMePage';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="finances" element={<FinancesPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="notes" element={<NotesPage />} />
+          <Route path="about" element={<AboutMePage />} />
         </Route>
       </Route>
     </Routes>

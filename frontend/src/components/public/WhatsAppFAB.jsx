@@ -1,14 +1,27 @@
 import { MessageCircle } from 'lucide-react';
+import { useFetch } from '../../hooks/useFetch';
+import { api } from '../../api/client';
 
-const WHATSAPP_NUMBER = '525535756858'; // Número del consultorio
+const FALLBACK_NUMBER = '525511965133'; // Default si el API aún no tiene el campo
 
 export default function WhatsAppFAB({ serviceName = '' }) {
+  const { data: dentists } = useFetch(api.getPublicDentists);
+
+  const getWhatsAppNumber = () => {
+    if (dentists && dentists.length > 0 && dentists[0].whatsappNumber) {
+      // Strip everything except digits and leading +
+      return dentists[0].whatsappNumber.replace(/[^\d+]/g, '').replace(/^\+/, '');
+    }
+    return FALLBACK_NUMBER;
+  };
+
   const generateWhatsAppLink = () => {
+    const number = getWhatsAppNumber();
     const message = serviceName
       ? `Hola, me gustaría agendar una cita para ${serviceName}. ¿Tienen disponibilidad?`
       : 'Hola, me gustaría agendar una cita. ¿Tienen disponibilidad?';
     const encodedMessage = encodeURIComponent(message);
-    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+    return `https://wa.me/${number}?text=${encodedMessage}`;
   };
 
   return (

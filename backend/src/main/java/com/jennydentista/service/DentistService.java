@@ -31,6 +31,8 @@ public class DentistService {
                 .name(dto.getName())
                 .specialty(dto.getSpecialty())
                 .phone(dto.getPhone())
+                .bio(dto.getBio())
+                .whatsappNumber(dto.getWhatsappNumber())
                 .build();
         return toDTO(dentistRepository.save(dentist));
     }
@@ -41,6 +43,8 @@ public class DentistService {
         dentist.setName(dto.getName());
         dentist.setSpecialty(dto.getSpecialty());
         dentist.setPhone(dto.getPhone());
+        dentist.setBio(dto.getBio());
+        dentist.setWhatsappNumber(dto.getWhatsappNumber());
         return toDTO(dentistRepository.save(dentist));
     }
 
@@ -54,6 +58,8 @@ public class DentistService {
                 .name(d.getName())
                 .specialty(d.getSpecialty())
                 .phone(d.getPhone())
+                .bio(d.getBio())
+                .whatsappNumber(d.getWhatsappNumber())
                 .build();
     }
 }

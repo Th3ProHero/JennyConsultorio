@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import BottomNavBar from './BottomNavBar';
-import { Globe, LogOut } from 'lucide-react';
+import { Globe, LogOut, UserRound } from 'lucide-react';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -56,6 +56,13 @@ export default function AdminLayout() {
               <span className="admin-fab-menu-subtitle">Jenny Dentista</span>
             </div>
             <div className="admin-fab-menu-divider" />
+            <button
+              className="admin-fab-menu-item"
+              onClick={() => { setMenuOpen(false); navigate('/admin/about'); }}
+            >
+              <UserRound size={16} />
+              About Me
+            </button>
             <button
               className="admin-fab-menu-item"
               onClick={() => { setMenuOpen(false); navigate('/'); }}

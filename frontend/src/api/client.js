@@ -121,6 +121,10 @@ export const api = {
   updateService: (id, data) => fetchWithConfig(`/admin/services/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteService: (id) => fetchWithConfig(`/admin/services/${id}`, { method: 'DELETE' }),
 
+  // ── Admin Dentist (About Me) ──
+  getAdminDentists: () => fetchWithConfig('/admin/dentists'),
+  updateDentist: (id, data) => fetchWithConfig(`/admin/dentists/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+
   // ── Dashboard ──
   getDashboard: (month, year) => {
     let query = '';

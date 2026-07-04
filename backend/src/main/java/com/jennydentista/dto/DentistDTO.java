@@ -8,4 +8,6 @@ public class DentistDTO {
     private String name;
     private String specialty;
     private String phone;
+    private String bio;
+    private String whatsappNumber;
 }

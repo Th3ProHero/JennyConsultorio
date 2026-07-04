@@ -180,7 +180,7 @@ export default function HeroSection({ dentists = [] }) {
               }}>
                 <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--color-border)', marginTop: '1rem' }}>
                   <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
-                    Odontóloga especialista apasionada por crear sonrisas hermosas y saludables. Te brindamos un trato cálido, honesto y con la mejor tecnología dental.
+                    {jenny.bio || 'Odontóloga especialista apasionada por crear sonrisas hermosas y saludables. Te brindamos un trato cálido, honesto y con la mejor tecnología dental.'}
                   </p>
                   {jenny.phone && (
                     <a href={`tel:${jenny.phone}`} onClick={(e) => e.stopPropagation()} style={{
